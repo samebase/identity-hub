@@ -9,7 +9,8 @@ README.md. The component's own rules live in its repository.
   `npx convex run`; `convex/email.ts` sends the codes through Cloudflare Email Sending with the
   token the stack mints; `convex/crons.ts` runs the cleanup.
 - `alchemy.run.ts` is the stack (project, production deployment, push); `scripts/check-keys.ts`
-  creates the key set once, inside the `deploy` script the push runs.
+  checks the key set inside the `deploy` script the push runs and never creates it, except for a
+  preview; `scripts/init-keys.ts` creates it once, by hand.
 - Never use the U+2014 em dash character. No `any`, no type assertions except `as const`.
 - `pnpm install`, then `pnpm run check`. `convex/_generated` is committed; `npx convex dev --once`
   refreshes it.

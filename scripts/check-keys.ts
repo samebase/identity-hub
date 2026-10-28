@@ -6,21 +6,26 @@
 // Creation is separate, because a new key set means a new pairwise salt, which changes every
 // subject the hub ever issued: an established hub that lost the variable restores its backup by
 // hand, never gets a new set from a deploy. A preview deployment is the one exception: it is new
-// and throwaway, so a preview deploy key (`preview:` prefix) creates the set when it is absent.
-// Everything else is `pnpm run keys:init`, scripts/init-keys.ts, run once by hand.
+// and throwaway, so the `deploy:preview` script passes --create-when-missing and the set is
+// created when it is absent. Everything else is `pnpm run keys:init`, scripts/init-keys.ts, run
+// once by hand.
 /// <reference types="node" />
 import { createKeySet, parseKeySet } from "@samebase/identity-broker";
 import process from "node:process";
 import { hasVariable, runConvex } from "./convex-cli.ts";
 
-async function main(selection: string[]) {
+const CREATE_FLAG = "--create-when-missing";
+
+async function main(args: string[]) {
+  const createWhenMissing = args.includes(CREATE_FLAG);
+  const selection = args.filter((arg) => arg !== CREATE_FLAG);
   if (await hasVariable("IDENTITY_BROKER_KEYS", selection)) {
     const current = await runConvex(["env", "get", "IDENTITY_BROKER_KEYS", ...selection]);
     parseKeySet(current.stdout.replace(/\n$/, ""));
     console.log("IDENTITY_BROKER_KEYS is set.");
     return;
   }
-  if (process.env["CONVEX_DEPLOY_KEY"]?.startsWith("preview:")) {
+  if (createWhenMissing) {
     await runConvex(["env", "set", ...selection, "IDENTITY_BROKER_KEYS"], {
       input: `${JSON.stringify(await createKeySet())}\n`,
     });

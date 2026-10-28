@@ -1,8 +1,9 @@
 // The stack of this hub, in the shape of samebase/base-alchemy. The stage `prod` is the production
 // deployment of the Convex project of this repository; any other stage, such as `pr-42` for a pull
 // request, is a preview deployment named after the stage, which `alchemy destroy` deletes. The
-// push is the `deploy` package script, which creates the key set on a new deployment and pushes
-// the functions. The stack is named after the repository, `owner/name`, and its Convex project
+// push is the `deploy` package script, which checks the key set and pushes the functions; a
+// preview runs `deploy:preview`, which also creates the preview's own key set on its first deploy.
+// The stack is named after the repository, `owner/name`, and its Convex project
 // after `name`. The state of every stage is in the `alchemy-state` project of the team.
 //
 // Every run needs the team token CONVEX_ACCESS_TOKEN, or a Convex CLI login (`npx convex login`)
@@ -53,6 +54,11 @@ export default Alchemy.Stack(
       // The push inputs besides the functions, package.json, and the lockfile.
       include: ["scripts/**", "tsconfig*.json"],
     } satisfies Convex.Source;
+    // A preview is new and throwaway, so its push may create its key set; production never does.
+    const previewSource = {
+      ...source,
+      command: ["node", "--run", "deploy:preview"],
+    } satisfies Convex.Source;
     // The email variables of every deployment. The token is a prop, so the state store holds it
     // next to the deployment it serves; it can only send email.
     const env = {
@@ -78,7 +84,7 @@ export default Alchemy.Stack(
             project,
             type: "preview",
             name: stage,
-            source,
+            source: previewSource,
             env,
           }).pipe(adopt(true), RemovalPolicy.destroy());
 

@@ -12,12 +12,12 @@ deployment variable or a line in `convex/connectors.ts`, so a copy of it runs an
 
 `alchemy.run.ts` is the stack, in the shape of every app of the team: the stage `prod` is the
 production deployment of the Convex project named after this repository, and the push is the
-`deploy` package script, which creates the key set on a new deployment and pushes the functions. The
-state is in the `alchemy-state` project of the team. Any other stage, such as `pr-42` for a pull
-request, is a preview deployment named after the stage, which `alchemy destroy` deletes.
-`.github/workflows/alchemy.yml` deploys each push to `main` to `prod`, each pull request to
-`pr-<number>` with a comment that names the preview's URL, and destroys that stage when the pull
-request closes.
+`deploy` package script, which checks the key set and pushes the functions (a preview's first push
+also creates the preview's own key set). The state is in the `alchemy-state` project of the team.
+Any other stage, such as `pr-42` for a pull request, is a preview deployment named after the stage,
+which `alchemy destroy` deletes. `.github/workflows/alchemy.yml` deploys each push to `main` to
+`prod`, each pull request to `pr-<number>` with a comment that names the preview's URL, and destroys
+that stage when the pull request closes.
 
 1. In the repository, set five secrets: `CONVEX_ACCESS_TOKEN`, the team's Convex access token, with
    which the run mints the deploy key itself; `CLOUDFLARE_EMAIL_API_TOKEN`, a Cloudflare account
