@@ -30,11 +30,11 @@ request closes.
    `alchemy.run.ts` to every deployment it pushes, production and previews alike: no email variable
    is set by hand. The hub sends each code once and keeps no copy of it.
 3. Create the keys of production once, by hand, with the Convex CLI login:
-   `pnpm run keys:init --prod` writes `IDENTITY_BROKER_KEYS`, the signing key and the pairwise
-   salt, and refuses a deployment that has the variable. Every deploy then checks the variable
-   before the push and stops when it is missing or holds anything that is not a key set; no deploy
-   ever creates or replaces it. A preview deployment is the one exception: it is new and throwaway,
-   so its first deploy creates its own set.
+   `pnpm run keys:init --prod` writes `IDENTITY_BROKER_KEYS`, the signing key and the pairwise salt,
+   and refuses a deployment that has the variable. Every deploy then checks the variable before the
+   push and stops when it is missing or holds anything that is not a key set; no deploy ever creates
+   or replaces it. A preview deployment is the one exception: it is new and throwaway, so its first
+   deploy creates its own set.
 4. Merge to `main`. The first run of the workflow on a project that exists already needs `adopt`
    checked (Run workflow on the Actions tab). From a laptop, `pnpm exec alchemy deploy --stage prod`
    runs the same stack with the Convex CLI login.
