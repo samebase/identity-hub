@@ -3,8 +3,11 @@
 minimumReleaseAge: 10080
 minimumReleaseAgeStrict: true
 minimumReleaseAgeIgnoreMissingTime: false
+# Decided here, because pnpm in CI refuses an install with undecided build scripts.
 allowBuilds:
   esbuild: true
+  core-js-pure: false
+  workerd: false
 peerDependencyRules:
   allowedVersions:
     "@samebase/alchemy-convex": "0.3.0"
