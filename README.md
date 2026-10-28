@@ -13,8 +13,11 @@ deployment variable or a line in `convex/connectors.ts`, so a copy of it runs an
 `alchemy.run.ts` is the stack, in the shape of every app of the team: the stage `prod` is the
 production deployment of the Convex project named after this repository, and the push is the
 `deploy` package script, which creates the key set on a new deployment and pushes the functions. The
-state is in the `alchemy-state` project of the team. `.github/workflows/alchemy.yml` deploys each
-push to `main`; a pull request runs the checks only.
+state is in the `alchemy-state` project of the team. Any other stage, such as `pr-42` for a pull
+request, is a preview deployment named after the stage, which `alchemy destroy` deletes.
+`.github/workflows/alchemy.yml` deploys each push to `main` to `prod`, each pull request to
+`pr-<number>` with a comment that names the preview's URL, and destroys that stage when the pull
+request closes.
 
 1. In the repository, set the secret `CONVEX_ACCESS_TOKEN`, the team's Convex access token. It is
    the only secret: the run mints the deploy key itself. Without it the workflow deploys nothing and
@@ -23,7 +26,9 @@ push to `main`; a pull request runs the checks only.
    [Cloudflare Email Sending](https://developers.cloudflare.com/email-service/): the account id as
    `CLOUDFLARE_EMAIL_ACCOUNT_ID`, a token with the Email Sending permission on that account as
    `CLOUDFLARE_EMAIL_API_TOKEN`, and the sender address as `EMAIL_FROM`. A push fails while one is
-   missing. The hub sends each code once and keeps no copy of it.
+   missing. Set the same three as the preview defaults of the project (Convex dashboard, project
+   settings, default environment variables), so every preview can send codes too. The hub sends each
+   code once and keeps no copy of it.
 3. Merge to `main`. The first run of the workflow on a project that exists already needs `adopt`
    checked (Run workflow on the Actions tab). The first deploy creates `IDENTITY_BROKER_KEYS`; every
    later deploy keeps it and stops when the variable holds anything that is not a key set. From a
