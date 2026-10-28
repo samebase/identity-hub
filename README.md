@@ -50,11 +50,10 @@ ids, the clients and the salt stay, so the subjects do not change.
 `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET` as repository secrets that the stack hands to the
 deployment, and that client's redirect URIs must include `<issuer>/connectors/google/callback`.
 GitHub uses the team's login OAuth App the same way, `AUTH_GITHUB_CLIENT_ID` and
-`AUTH_GITHUB_CLIENT_SECRET`; its one callback URL is `https://samebase.com/`, which GitHub matches
-by host with subdomains and by path prefix, so `<issuer>/connectors/github/callback` on the hub's
-subdomain passes. Another provider is one more wrapper line, its variables declared in
-`convex/convex.config.ts` and handed down the same way; the broker's `email()` wrapper adds email
-codes, with a sender behind it and the abuse controls a public mail endpoint needs.
+`AUTH_GITHUB_CLIENT_SECRET`; that app lists `<issuer>/connectors/github/callback` among its redirect
+URIs, exact, next to Samebase's own. Another provider is one more wrapper line, its variables
+declared in `convex/convex.config.ts` and handed down the same way; the broker's `email()` wrapper
+adds email codes, with a sender behind it and the abuse controls a public mail endpoint needs.
 
 ## Register an app
 
