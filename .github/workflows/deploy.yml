@@ -17,7 +17,8 @@ concurrency:
 jobs:
   production:
     name: production
-    if: vars.CONVEX_DEPLOY_ENABLED == 'true'
+    # Only main deploys: a manual run from another branch is refused here.
+    if: vars.CONVEX_DEPLOY_ENABLED == 'true' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     timeout-minutes: 15
     environment: production

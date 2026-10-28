@@ -3,7 +3,8 @@
 A Convex app that mounts the identity-broker component and is the sign-in hub of one team. See
 README.md. The component's own rules live in its repository.
 
-- `convex/connectors.ts` is the one file a fork edits: which providers the hub offers.
+- `convex/connectors.ts` lists the providers the hub offers. A provider that needs credentials also
+  gets its variables declared in `convex/convex.config.ts`.
 - `convex/http.ts` mounts the broker; `convex/identityBroker.ts` exports the admin functions for
   `npx convex run`; `convex/email.ts` sends the codes through Cloudflare Email Sending;
   `convex/crons.ts` runs the cleanup.
