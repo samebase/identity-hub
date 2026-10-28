@@ -3,7 +3,7 @@ import { internal } from "./_generated/api";
 
 const crons = cronJobs();
 
-// Expired requests and codes, idle preview clients, old audit rows. Off the top of the hour.
+// Expired requests and codes, old audit rows. Off the top of the hour.
 crons.daily(
   "identity broker cleanup",
   { hourUTC: 4, minuteUTC: 17 },

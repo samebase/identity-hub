@@ -8,15 +8,17 @@
 // hand, never gets a new set from a deploy. No deploy creates keys; `pnpm run keys:init`,
 // scripts/init-keys.ts, does it once by hand.
 /// <reference types="node" />
-import { parseKeySet } from "@samebase/identity-broker";
+import { assertKeySetUsable, parseKeySet } from "@samebase/identity-broker";
 import process from "node:process";
 import { hasVariable, runConvex } from "./convex-cli.ts";
 
 async function main(selection: string[]) {
   if (await hasVariable("IDENTITY_BROKER_KEYS", selection)) {
     const current = await runConvex(["env", "get", "IDENTITY_BROKER_KEYS", ...selection]);
-    parseKeySet(current.stdout.replace(/\n$/, ""));
-    console.log("IDENTITY_BROKER_KEYS is set.");
+    // The shape, then a sign-and-verify round trip through the broker's own signer and JWKS: a
+    // key set that would fail at the first sign-in stops the deploy here.
+    await assertKeySetUsable(parseKeySet(current.stdout.replace(/\n$/, "")));
+    console.log("IDENTITY_BROKER_KEYS is set and usable.");
     return;
   }
   throw new Error(
