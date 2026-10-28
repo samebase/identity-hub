@@ -16,7 +16,12 @@ on:
 permissions: { contents: read, pull-requests: write }
 # One run per stage at a time: the state store has no lock. Pending runs wait instead of replacing
 # each other. A closed pull request keeps its head_ref.
-concurrency: { group: "alchemy-${{ github.head_ref || github.ref_name }}", queue: max }
+concurrency:
+  {
+    group: "alchemy-${{ github.head_ref || github.ref_name }}",
+    queue: max,
+    cancel-in-progress: false,
+  }
 jobs:
   alchemy:
     # Pull requests from forks get no secrets.
@@ -74,6 +79,8 @@ jobs:
         env:
           ADOPT: ${{ inputs.adopt }}
           CONVEX_ACCESS_TOKEN: ${{ secrets.CONVEX_ACCESS_TOKEN }}
+          CLOUDFLARE_EMAIL_API_TOKEN: ${{ secrets.CLOUDFLARE_EMAIL_API_TOKEN }}
+          CLOUDFLARE_EMAIL_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_EMAIL_ACCOUNT_ID }}
       - name: Deploy the preview
         if:
           steps.keys.outputs.skip != 'true' && github.event_name == 'pull_request' &&
@@ -83,14 +90,15 @@ jobs:
           CONVEX_ACCESS_TOKEN: ${{ secrets.CONVEX_ACCESS_TOKEN }}
           CLOUDFLARE_EMAIL_API_TOKEN: ${{ secrets.CLOUDFLARE_EMAIL_API_TOKEN }}
           CLOUDFLARE_EMAIL_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_EMAIL_ACCOUNT_ID }}
-          CLOUDFLARE_EMAIL_API_TOKEN: ${{ secrets.CLOUDFLARE_EMAIL_API_TOKEN }}
-          CLOUDFLARE_EMAIL_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_EMAIL_ACCOUNT_ID }}
           GITHUB_TOKEN: ${{ github.token }}
+      # The stack reads the email values at plan time, on a destroy too.
       - name: Destroy the preview
         if: steps.keys.outputs.skip != 'true' && github.event.action == 'closed'
         run: pnpm exec alchemy destroy --stage "$STAGE" --yes --no-input
         env:
           CONVEX_ACCESS_TOKEN: ${{ secrets.CONVEX_ACCESS_TOKEN }}
+          CLOUDFLARE_EMAIL_API_TOKEN: ${{ secrets.CLOUDFLARE_EMAIL_API_TOKEN }}
+          CLOUDFLARE_EMAIL_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_EMAIL_ACCOUNT_ID }}
           CLOUDFLARE_EMAIL_API_TOKEN: ${{ secrets.CLOUDFLARE_EMAIL_API_TOKEN }}
           CLOUDFLARE_EMAIL_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_EMAIL_ACCOUNT_ID }}
           GITHUB_TOKEN: ${{ github.token }}
