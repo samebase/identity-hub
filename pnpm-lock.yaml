@@ -1411,7 +1411,7 @@ packages:
         optional: true
 
   '@samebase/identity-broker@file:vendor/samebase-identity-broker-0.1.0.tgz':
-    resolution: {integrity: sha512-WI/qXayeFD1CFZQum0xxZU8A+lVUtVqR1CPBnfpA0K9BM/ZOgMrqWOQwBcQPM9Y7R9+rZRBkLoi1n+oh8QX9Gg==, tarball: file:vendor/samebase-identity-broker-0.1.0.tgz}
+    resolution: {integrity: sha512-pKVvFQV+/tbKtJ+hrFoCySkNJ92YSwNsX8c8lCFsFrYUcJBF9a5beco/gOWJV+39y7MFsksyzr6jyViYLxMaRA==, tarball: file:vendor/samebase-identity-broker-0.1.0.tgz}
     version: 0.1.0
     hasBin: true
     peerDependencies:
