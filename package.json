@@ -4,7 +4,9 @@
   "type": "module",
   "scripts": {
     "dev": "convex dev",
-    "deploy": "node ./scripts/ensure-keys.ts && convex deploy --yes",
+    "deploy": "node ./scripts/check-keys.ts && convex deploy --yes",
+    "deploy:preview": "node ./scripts/check-keys.ts --create-when-missing && convex deploy --yes",
+    "keys:init": "node ./scripts/init-keys.ts",
     "check": "vp fmt --check && vp lint && pnpm run typecheck",
     "typecheck": "tsc --project convex/tsconfig.json && tsc --project tsconfig.node.json",
     "format": "vp fmt",

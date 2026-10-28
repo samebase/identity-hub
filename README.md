@@ -12,12 +12,12 @@ deployment variable or a line in `convex/connectors.ts`, so a copy of it runs an
 
 `alchemy.run.ts` is the stack, in the shape of every app of the team: the stage `prod` is the
 production deployment of the Convex project named after this repository, and the push is the
-`deploy` package script, which creates the key set on a new deployment and pushes the functions. The
-state is in the `alchemy-state` project of the team. Any other stage, such as `pr-42` for a pull
-request, is a preview deployment named after the stage, which `alchemy destroy` deletes.
-`.github/workflows/alchemy.yml` deploys each push to `main` to `prod`, each pull request to
-`pr-<number>` with a comment that names the preview's URL, and destroys that stage when the pull
-request closes.
+`deploy` package script, which checks the key set and pushes the functions (a preview's first push
+also creates the preview's own key set). The state is in the `alchemy-state` project of the team.
+Any other stage, such as `pr-42` for a pull request, is a preview deployment named after the stage,
+which `alchemy destroy` deletes. `.github/workflows/alchemy.yml` deploys each push to `main` to
+`prod`, each pull request to `pr-<number>` with a comment that names the preview's URL, and destroys
+that stage when the pull request closes.
 
 1. In the repository, set five secrets: `CONVEX_ACCESS_TOKEN`, the team's Convex access token, with
    which the run mints the deploy key itself; `CLOUDFLARE_EMAIL_API_TOKEN`, a Cloudflare account
@@ -29,13 +29,19 @@ request closes.
 2. The stack hands the email token, the account id, and the sender `EMAIL_FROM` from
    `alchemy.run.ts` to every deployment it pushes, production and previews alike: no email variable
    is set by hand. The hub sends each code once and keeps no copy of it.
-3. Merge to `main`. The first run of the workflow on a project that exists already needs `adopt`
-   checked (Run workflow on the Actions tab). The first deploy creates `IDENTITY_BROKER_KEYS`; every
-   later deploy keeps it and stops when the variable holds anything that is not a key set. From a
-   laptop, `pnpm exec alchemy deploy --stage prod` runs the same stack with the Convex CLI login.
+3. Create the keys of production once, by hand, with the Convex CLI login:
+   `pnpm run keys:init --prod` writes `IDENTITY_BROKER_KEYS`, the signing key and the pairwise salt,
+   and refuses a deployment that has the variable. Every deploy then checks the variable before the
+   push and stops when it is missing or holds anything that is not a key set; no deploy ever creates
+   or replaces it. A preview deployment is the one exception: it is new and throwaway, so its first
+   deploy creates its own set.
+4. Merge to `main`. The first run of the workflow on a project that exists already needs `adopt`
+   checked (Run workflow on the Actions tab). From a laptop, `pnpm exec alchemy deploy --stage prod`
+   runs the same stack with the Convex CLI login.
 
 Back up `IDENTITY_BROKER_KEYS` somewhere safe. It holds the signing keys and the pairwise salt: a
-hub that loses it issues new subjects to every user of every app.
+hub that loses it issues new subjects to every user of every app. An established hub that lost the
+variable gets the backup restored by hand; its deploys stop until then.
 
 ## Issuer
 

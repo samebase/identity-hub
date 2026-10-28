@@ -83,6 +83,24 @@ jobs:
           CLOUDFLARE_EMAIL_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_EMAIL_ACCOUNT_ID }}
           GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
           GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
+      # A re-run of an old run replays its event: a closed pull request must not get its preview
+      # back, and a reopened one must not lose it. The pull request's current state decides.
+      - name: Check the pull request's current state
+        if: steps.keys.outputs.skip != 'true' && github.event_name == 'pull_request'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR: ${{ github.event.pull_request.number }}
+          CLOSING: ${{ github.event.action == 'closed' }}
+        run: |
+          state=$(gh pr view "$PR" --repo "$GITHUB_REPOSITORY" --json state --jq .state)
+          if [ "$CLOSING" = "true" ] && [ "$state" = "OPEN" ]; then
+            echo "::error::The pull request is open again. Nothing was destroyed."
+            exit 1
+          fi
+          if [ "$CLOSING" != "true" ] && [ "$state" != "OPEN" ]; then
+            echo "::error::The pull request is $state. Nothing was deployed."
+            exit 1
+          fi
       - name: Deploy the preview
         if:
           steps.keys.outputs.skip != 'true' && github.event_name == 'pull_request' &&

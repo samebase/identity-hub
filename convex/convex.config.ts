@@ -2,8 +2,9 @@ import identityBroker from "@samebase/identity-broker/convex.config";
 import { defineApp } from "convex/server";
 import { v } from "convex/values";
 
-// A push fails while a required variable is missing. scripts/ensure-keys.ts writes
-// IDENTITY_BROKER_KEYS before the first deploy; the email variables are set once by hand.
+// A push fails while a required variable is missing. scripts/check-keys.ts checks
+// IDENTITY_BROKER_KEYS before each deploy and scripts/init-keys.ts creates it once by hand; the
+// stack hands the email and Google variables to every deployment.
 const app = defineApp({
   env: {
     /** The key set and the pairwise salt: `npx identity-broker keys`. */
