@@ -29,12 +29,20 @@ function readReceipt(body: unknown) {
   };
 }
 
+/** The HTTP status in an error the Cloudflare SDK throws for a non-2xx answer, else 0. */
+const statusOf = (cause: unknown) => {
+  const error = record(cause);
+  return typeof error["status"] === "number" ? error["status"] : 0;
+};
+
 /**
  * Delivers one sign-in code, directly through Cloudflare Email Sending. The broker calls this and
  * never sees how the mail goes out. Nothing is stored: a code is a secret for ten minutes, so no
  * sent-mail history keeps it. The code is in the body only, not the subject. A recipient that
  * Cloudflare reports as bounced or suppressed fails the send, which the broker shows as a delivery
  * error; a queued recipient counts as sent, because Cloudflare delivers it when its queue clears.
+ * Only a status and counts ever leave this function in an error: the SDK's own error carries the
+ * response body, which may name the address, so it is not rethrown.
  */
 export const sendCode = internalAction({
   args: { to: v.string(), code: v.string(), appName: v.string() },
@@ -55,11 +63,13 @@ export const sendCode = internalAction({
         subject: `Your ${args.appName} sign-in code`,
         text: `Your ${args.appName} sign-in code is ${args.code}. It expires in ten minutes. If you did not ask for it, ignore this email.`,
       })
-      .asResponse();
+      .asResponse()
+      .catch((cause: unknown) => {
+        throw new Error(`Email delivery failed: the sending API answered ${statusOf(cause)}`);
+      });
     const receipt = readReceipt(await response.json());
     const sent = receipt.delivered.includes(args.to) || receipt.queued.includes(args.to);
     if (!response.ok || !receipt.success || !sent) {
-      // The status and the counts name no address and no code.
       throw new Error(
         `Email delivery failed: status ${response.status}, delivered ${receipt.delivered.length}, queued ${receipt.queued.length}, bounced ${receipt.permanentBounces.length}, suppressed ${receipt.suppressed.length}`,
       );
