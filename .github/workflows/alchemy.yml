@@ -1,8 +1,8 @@
 # Deploys with Alchemy (alchemy.run.ts): a push to main deploys the stage `prod`, the production
 # deployment, and nothing else; the hub has no previews. The state is in the `alchemy-state`
 # project of the team, under the stack name GITHUB_REPOSITORY. The run needs the team token
-# CONVEX_ACCESS_TOKEN, with which it mints the deploy key itself, plus the Google client, which the
-# stack hands to the deployment. Only the Alchemy step gets the secrets.
+# CONVEX_ACCESS_TOKEN, with which it mints the deploy key itself, plus the Google and GitHub
+# clients, which the stack hands to the deployment. Only the Alchemy step gets the secrets.
 name: alchemy
 on:
   push: { branches: [main] }
@@ -56,3 +56,5 @@ jobs:
           CONVEX_ACCESS_TOKEN: ${{ secrets.CONVEX_ACCESS_TOKEN }}
           GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
           GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
+          GITHUB_CLIENT_ID: ${{ secrets.GITHUB_CLIENT_ID }}
+          GITHUB_CLIENT_SECRET: ${{ secrets.GITHUB_CLIENT_SECRET }}

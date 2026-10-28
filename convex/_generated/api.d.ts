@@ -10,7 +10,6 @@
 
 import type * as connectors from "../connectors.js";
 import type * as crons from "../crons.js";
-import type * as email from "../email.js";
 import type * as http from "../http.js";
 import type * as identityBroker from "../identityBroker.js";
 
@@ -23,7 +22,6 @@ import type {
 declare const fullApi: ApiFromModules<{
   connectors: typeof connectors;
   crons: typeof crons;
-  email: typeof email;
   http: typeof http;
   identityBroker: typeof identityBroker;
 }>;

@@ -17,6 +17,12 @@ const app = defineApp({
      */
     GOOGLE_CLIENT_ID: v.string(),
     GOOGLE_CLIENT_SECRET: v.string(),
+    /**
+     * The team's GitHub login OAuth App, whose callback URL covers
+     * `<issuer>/connectors/github/callback` by prefix. The stack hands both to the deployment.
+     */
+    GITHUB_CLIENT_ID: v.string(),
+    GITHUB_CLIENT_SECRET: v.string(),
   },
 });
 

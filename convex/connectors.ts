@@ -1,4 +1,4 @@
-import { google, type Connector } from "@samebase/identity-broker";
+import { github, google, type Connector } from "@samebase/identity-broker";
 import { env } from "./_generated/server";
 
 /**
@@ -15,4 +15,8 @@ import { env } from "./_generated/server";
 // wrapper is one line away when a hub wants it.
 export const connectors: Connector[] = [
   google({ clientId: () => env.GOOGLE_CLIENT_ID, clientSecret: () => env.GOOGLE_CLIENT_SECRET }),
+  // The team's GitHub login OAuth App, whose callback URL is https://samebase.com/: GitHub matches
+  // a redirect by host with subdomains and by path prefix, so <issuer>/connectors/github/callback
+  // on auth.samebase.com passes without a second app.
+  github({ clientId: () => env.GITHUB_CLIENT_ID, clientSecret: () => env.GITHUB_CLIENT_SECRET }),
 ];
