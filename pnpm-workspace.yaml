@@ -1,0 +1,10 @@
+# Wait 7 days before resolving newly published package versions, so the ecosystem has time to
+# detect and yank compromised releases before CI installs them.
+minimumReleaseAge: 10080
+minimumReleaseAgeStrict: true
+minimumReleaseAgeIgnoreMissingTime: false
+allowBuilds:
+  esbuild: true
+peerDependencyRules:
+  allowedVersions:
+    "@samebase/alchemy-convex": "0.3.0"

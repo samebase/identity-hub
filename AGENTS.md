@@ -1,0 +1,12 @@
+# AGENTS.md
+
+A Convex app that mounts the identity-broker component and is the sign-in hub of one team. See
+README.md. The component's own rules live in its repository.
+
+- `convex/connectors.ts` is the one file a fork edits: which providers the hub offers.
+- `convex/http.ts` mounts the broker; `convex/identityBroker.ts` exports the admin functions for
+  `npx convex run`; `convex/email.ts` sends the codes through Cloudflare Email Sending;
+  `convex/crons.ts` runs the cleanup.
+- `alchemy.run.ts` owns the Convex project; `scripts/ensure-keys.ts` creates the key set once.
+- Never use the U+2014 em dash character. No `any`, no type assertions except `as const`.
+- `pnpm install`, `pnpm exec convex codegen`, then `pnpm run check`.

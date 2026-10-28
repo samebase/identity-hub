@@ -1,0 +1,99 @@
+# The setup stack (alchemy.run.ts): a plan on pull requests that touch it, a deploy on main. Set the
+# CONVEX_TEAM_ID variable and the CLOUDFLARE_API_TOKEN, CLOUDFLARE_ACCOUNT_ID and CONVEX_ACCESS_TOKEN
+# secrets to turn it on.
+name: alchemy
+
+on:
+  pull_request:
+    paths:
+      [
+        alchemy.run.ts,
+        scripts/deploy-names.ts,
+        package.json,
+        pnpm-lock.yaml,
+        .github/workflows/alchemy.yml,
+      ]
+  push:
+    branches: [main]
+    paths:
+      [
+        alchemy.run.ts,
+        scripts/deploy-names.ts,
+        package.json,
+        pnpm-lock.yaml,
+        .github/workflows/alchemy.yml,
+      ]
+  workflow_dispatch:
+    inputs:
+      adopt:
+        description: "Adopt resources that exist but are not in the state yet"
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: alchemy
+  cancel-in-progress: false
+
+env:
+  CI: "true"
+  CONVEX_TEAM_ID: ${{ vars.CONVEX_TEAM_ID }}
+
+jobs:
+  plan:
+    if:
+      vars.CONVEX_TEAM_ID != '' && github.event_name == 'pull_request' &&
+      github.event.pull_request.head.repo.fork == false
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - name: Setup pnpm
+        uses: pnpm/action-setup@0977fd99725f1db4007ccb2928dbb4e90d06cc86 # v6
+      - name: Setup Node.js
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7
+        with:
+          node-version-file: .node-version
+          cache: pnpm
+      - name: Install dependencies without lifecycle scripts
+        run: pnpm install --frozen-lockfile --ignore-scripts
+      - name: Plan the stack
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          CONVEX_ACCESS_TOKEN: ${{ secrets.CONVEX_ACCESS_TOKEN }}
+        run: pnpm exec alchemy plan --stage prod --no-input --detailed
+
+  deploy:
+    if:
+      vars.CONVEX_TEAM_ID != '' && (github.event_name == 'push' || (github.event_name ==
+      'workflow_dispatch' && github.ref_name == github.event.repository.default_branch))
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - name: Setup pnpm
+        uses: pnpm/action-setup@0977fd99725f1db4007ccb2928dbb4e90d06cc86 # v6
+      - name: Setup Node.js
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7
+        with:
+          node-version-file: .node-version
+          cache: pnpm
+      - name: Install dependencies without lifecycle scripts
+        run: pnpm install --frozen-lockfile --ignore-scripts
+      - name: Deploy the stack
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          CONVEX_ACCESS_TOKEN: ${{ secrets.CONVEX_ACCESS_TOKEN }}
+        run:
+          pnpm exec alchemy deploy --stage prod --yes --no-input --detect-drift ${{ inputs.adopt &&
+          '--adopt' || '' }}
