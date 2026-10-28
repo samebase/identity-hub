@@ -1,28 +1,23 @@
-// The stack of this hub, in the shape of samebase/base-alchemy. The stage `prod` is the production
-// deployment of the Convex project of this repository; any other stage, such as `pr-42` for a pull
-// request, is a preview deployment named after the stage, which `alchemy destroy` deletes. The
-// push is the `deploy` package script, which checks the key set and pushes the functions; a
-// preview runs `deploy:preview`, which also creates the preview's own key set on its first deploy.
-// The stack is named after the repository, `owner/name`, and its Convex project
-// after `name`. The state of every stage is in the `alchemy-state` project of the team.
+// The stack of this hub, in the shape of samebase/base-alchemy with one stage: `prod` is the
+// production deployment of the Convex project of this repository, and nothing else is deployed.
+// The hub has no previews: no app points at one, and Google cannot sign in on one, since only the
+// production callback is registered at Google. The push is the `deploy` package script, which
+// checks the key set and pushes the functions. The stack is named after the repository,
+// `owner/name`, and its Convex project after `name`. The state is in the `alchemy-state` project
+// of the team.
 //
 // Every run needs the team token CONVEX_ACCESS_TOKEN, or a Convex CLI login (`npx convex login`)
 // on a laptop; it mints the deploy key itself. Every run also reads CLOUDFLARE_EMAIL_API_TOKEN, a
 // Cloudflare account token limited to Email Sending, and CLOUDFLARE_EMAIL_ACCOUNT_ID, and hands
-// them with the sender address to every deployment it pushes, production and previews alike: no
-// email variable is ever set by hand. It reads GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET the same
-// way, for the Google connector.
+// them with the sender address to the deployment: no email variable is ever set by hand. It reads
+// GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET the same way, for the Google connector.
 //   pnpm exec alchemy deploy --stage prod
 import { execFileSync } from "node:child_process";
-import * as GitHub from "@alchemy.run/github";
 import * as Convex from "@samebase/alchemy-convex";
 import * as Alchemy from "alchemy";
-import { adopt } from "alchemy/AdoptPolicy";
-import * as Output from "alchemy/Output";
 import * as RemovalPolicy from "alchemy/RemovalPolicy";
 import * as Config from "effect/Config";
 import * as Effect from "effect/Effect";
-import * as Layer from "effect/Layer";
 
 /** The Convex team that holds the project and the state. */
 const team = "nicu";
@@ -42,25 +37,21 @@ const projectName = repository.slice(repository.indexOf("/") + 1);
 
 export default Alchemy.Stack(
   repository,
-  {
-    providers: Layer.mergeAll(GitHub.providers(), Convex.providers()),
-    state: Convex.state({ team }),
-  },
+  { providers: Convex.providers(), state: Convex.state({ team }) },
   Effect.gen(function* () {
     const { stage } = yield* Alchemy.Stack;
+    // One stage: any other name would create a second project and deployment with this name.
+    if (stage !== "prod") {
+      throw new Error(`This stack has one stage, prod. The stage ${stage} is not deployed.`);
+    }
     const source = {
       path: "./convex",
       command: ["node", "--run", "deploy"],
       // The push inputs besides the functions, package.json, and the lockfile.
       include: ["scripts/**", "tsconfig*.json"],
     } satisfies Convex.Source;
-    // A preview is new and throwaway, so its push may create its key set; production never does.
-    const previewSource = {
-      ...source,
-      command: ["node", "--run", "deploy:preview"],
-    } satisfies Convex.Source;
-    // The email variables of every deployment. The token is a prop, so the state store holds it
-    // next to the deployment it serves; it can only send email.
+    // The variables of the deployment. The token is a prop, so the state store holds it next to
+    // the deployment it serves; it can only send email.
     const env = {
       CLOUDFLARE_EMAIL_ACCOUNT_ID: yield* Config.String("CLOUDFLARE_EMAIL_ACCOUNT_ID"),
       CLOUDFLARE_EMAIL_API_TOKEN: yield* Config.Redacted("CLOUDFLARE_EMAIL_API_TOKEN"),
@@ -68,37 +59,17 @@ export default Alchemy.Stack(
       GOOGLE_CLIENT_ID: yield* Config.String("GOOGLE_CLIENT_ID"),
       GOOGLE_CLIENT_SECRET: yield* Config.Redacted("GOOGLE_CLIENT_SECRET"),
     };
-
-    // The stage `prod` owns the project and keeps it on destroy: it holds the hub's registrations
-    // and the key set. A project with this name that the stack did not create is taken over with
-    // `alchemy deploy --adopt`. A preview stage reads the project by its slug, so it does not
-    // depend on the state of `prod`; adopt(true) takes it into the state of that stage only.
-    const project =
-      stage === "prod"
-        ? yield* Convex.Project("Project", { team, name: projectName }).pipe(RemovalPolicy.retain())
-        : yield* Convex.Project("Project", { team, slug: projectName }).pipe(adopt(true));
-    const deployment =
-      stage === "prod"
-        ? yield* Convex.Deployment("Deployment", { project, type: "prod", source, env })
-        : yield* Convex.Deployment("Deployment", {
-            project,
-            type: "preview",
-            name: stage,
-            source: previewSource,
-            env,
-          }).pipe(adopt(true), RemovalPolicy.destroy());
-
-    const github = yield* GitHub.GitHubEnv;
-    if (github?.pr) {
-      // Retained: a closed pull request keeps the comment, as a record of what was deployed; the
-      // preview's URL stops answering when the stage is destroyed.
-      yield* GitHub.Comment("PreviewComment", {
-        owner: github.owner,
-        repository: github.repository,
-        issueNumber: github.pr,
-        body: Output.interpolate`Preview \`${stage}\`: ${deployment.siteUrl}`,
-      }).pipe(RemovalPolicy.retain());
-    }
+    // The project is kept on destroy: it holds the hub's registrations and the key set. A project
+    // with this name that the stack did not create is taken over with `alchemy deploy --adopt`.
+    const project = yield* Convex.Project("Project", { team, name: projectName }).pipe(
+      RemovalPolicy.retain(),
+    );
+    const deployment = yield* Convex.Deployment("Deployment", {
+      project,
+      type: "prod",
+      source,
+      env,
+    });
     return { url: deployment.siteUrl };
   }),
 );

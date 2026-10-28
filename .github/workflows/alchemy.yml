@@ -1,62 +1,40 @@
-# Deploys with Alchemy (alchemy.run.ts). A push to main deploys the stage `prod`, the production
-# deployment. A pull request from this repository deploys the stage `pr-<number>`, a preview with
-# that name; closing the pull request destroys the stage and deletes the preview. The state of
-# every stage is in the `alchemy-state` project of the team, under the stack name
-# GITHUB_REPOSITORY. Every run needs only the team token CONVEX_ACCESS_TOKEN; it mints the deploy
-# keys itself, plus CLOUDFLARE_EMAIL_API_TOKEN (a Cloudflare account token limited to Email
-# Sending) and CLOUDFLARE_EMAIL_ACCOUNT_ID, which it hands to every deployment it pushes. Only the
-# Alchemy steps get the secrets.
+# Deploys with Alchemy (alchemy.run.ts): a push to main deploys the stage `prod`, the production
+# deployment, and nothing else; the hub has no previews. The state is in the `alchemy-state`
+# project of the team, under the stack name GITHUB_REPOSITORY. The run needs the team token
+# CONVEX_ACCESS_TOKEN, with which it mints the deploy key itself, plus CLOUDFLARE_EMAIL_API_TOKEN
+# (a Cloudflare account token limited to Email Sending), CLOUDFLARE_EMAIL_ACCOUNT_ID, and the
+# Google client, which the stack hands to the deployment. Only the Alchemy step gets the secrets.
 name: alchemy
 on:
   push: { branches: [main] }
-  pull_request: { types: [opened, synchronize, reopened, closed] }
   # Run once on main with adopt to take over a project with the name of the repository that
   # exists already.
   workflow_dispatch: { inputs: { adopt: { type: boolean, default: false } } }
-permissions: { contents: read, pull-requests: write }
-# One run per stage at a time: the state store has no lock. Pending runs wait instead of replacing
-# each other. A closed pull request keeps its head_ref.
-concurrency:
-  {
-    group: "alchemy-${{ github.head_ref || github.ref_name }}",
-    queue: max,
-    cancel-in-progress: false,
-  }
+permissions: { contents: read }
+# One deploy at a time: the state store has no lock. A newer push waits, so the last deploy is the
+# newest commit.
+concurrency: { group: alchemy-prod, queue: max, cancel-in-progress: false }
 jobs:
   alchemy:
-    # Pull requests from forks get no secrets.
-    if:
-      github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name ==
-      github.repository
+    # A dispatch from another branch deploys nothing: only main is production.
+    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     timeout-minutes: 15
-    env:
-      BRANCH: ${{ github.head_ref || github.ref_name }}
-      # The stage, as https://alchemy.run/environments/ci names it: `pr-<number>` for a pull
-      # request, `prod` on main, and the branch name otherwise, where no step below deploys.
-      STAGE:
-        ${{ github.event_name == 'pull_request' && format('pr-{0}', github.event.number) ||
-        (github.ref == 'refs/heads/main' && 'prod' || github.ref_name) }}
-      # GitHub.GitHubEnv in alchemy.run.ts reads it for the preview comment. Empty on a push.
-      PULL_REQUEST: ${{ github.event.pull_request.number }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          ref: ${{ github.event.pull_request.head.sha || github.sha }}
-          persist-credentials: false
+        with: { persist-credentials: false }
       - uses: pnpm/action-setup@0977fd99725f1db4007ccb2928dbb4e90d06cc86 # v6
       - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with: { node-version-file: .node-version, cache: pnpm }
       - run: pnpm install --frozen-lockfile
       # A re-run of an old run must not put older code over newer code.
-      - name: Check that the checkout is the head of the branch
-        if: github.event.action != 'closed'
+      - name: Check that the checkout is the head of main
         env: { TOKEN: "${{ github.token }}" }
         run: |
           auth=$(printf 'x-access-token:%s' "$TOKEN" | base64 | tr -d '\n')
-          head=$(git -c "http.extraheader=AUTHORIZATION: basic $auth" ls-remote origin "refs/heads/$BRANCH" | cut -f1)
+          head=$(git -c "http.extraheader=AUTHORIZATION: basic $auth" ls-remote origin refs/heads/main | cut -f1)
           if [ "$(git rev-parse HEAD)" != "$head" ]; then
-            echo "::error::The checkout is not the head of $BRANCH ($head). Nothing was deployed."
+            echo "::error::The checkout is not the head of main ($head). Nothing was deployed."
             exit 1
           fi
       # A repository without the token, such as a copy of this one, deploys nothing and says so.
@@ -70,12 +48,10 @@ jobs:
             echo "skip=true" >> "$GITHUB_OUTPUT"
           fi
       - name: Deploy production
-        if:
-          steps.keys.outputs.skip != 'true' && github.event_name != 'pull_request' && github.ref ==
-          'refs/heads/main'
+        if: steps.keys.outputs.skip != 'true'
         run: |
           if [ "$ADOPT" = "true" ]; then set -- --adopt; fi
-          pnpm exec alchemy deploy --stage "$STAGE" --yes --no-input "$@"
+          pnpm exec alchemy deploy --stage prod --yes --no-input "$@"
         env:
           ADOPT: ${{ inputs.adopt }}
           CONVEX_ACCESS_TOKEN: ${{ secrets.CONVEX_ACCESS_TOKEN }}
@@ -83,44 +59,3 @@ jobs:
           CLOUDFLARE_EMAIL_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_EMAIL_ACCOUNT_ID }}
           GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
           GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
-      # A re-run of an old run replays its event: a closed pull request must not get its preview
-      # back, and a reopened one must not lose it. The pull request's current state decides.
-      - name: Check the pull request's current state
-        if: steps.keys.outputs.skip != 'true' && github.event_name == 'pull_request'
-        env:
-          GH_TOKEN: ${{ github.token }}
-          PR: ${{ github.event.pull_request.number }}
-          CLOSING: ${{ github.event.action == 'closed' }}
-        run: |
-          state=$(gh pr view "$PR" --repo "$GITHUB_REPOSITORY" --json state --jq .state)
-          if [ "$CLOSING" = "true" ] && [ "$state" = "OPEN" ]; then
-            echo "::error::The pull request is open again. Nothing was destroyed."
-            exit 1
-          fi
-          if [ "$CLOSING" != "true" ] && [ "$state" != "OPEN" ]; then
-            echo "::error::The pull request is $state. Nothing was deployed."
-            exit 1
-          fi
-      - name: Deploy the preview
-        if:
-          steps.keys.outputs.skip != 'true' && github.event_name == 'pull_request' &&
-          github.event.action != 'closed'
-        run: pnpm exec alchemy deploy --stage "$STAGE" --yes --no-input
-        env:
-          CONVEX_ACCESS_TOKEN: ${{ secrets.CONVEX_ACCESS_TOKEN }}
-          CLOUDFLARE_EMAIL_API_TOKEN: ${{ secrets.CLOUDFLARE_EMAIL_API_TOKEN }}
-          CLOUDFLARE_EMAIL_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_EMAIL_ACCOUNT_ID }}
-          GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
-          GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
-          GITHUB_TOKEN: ${{ github.token }}
-      # The stack reads the email values at plan time, on a destroy too.
-      - name: Destroy the preview
-        if: steps.keys.outputs.skip != 'true' && github.event.action == 'closed'
-        run: pnpm exec alchemy destroy --stage "$STAGE" --yes --no-input
-        env:
-          CONVEX_ACCESS_TOKEN: ${{ secrets.CONVEX_ACCESS_TOKEN }}
-          CLOUDFLARE_EMAIL_API_TOKEN: ${{ secrets.CLOUDFLARE_EMAIL_API_TOKEN }}
-          CLOUDFLARE_EMAIL_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_EMAIL_ACCOUNT_ID }}
-          GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
-          GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
-          GITHUB_TOKEN: ${{ github.token }}
