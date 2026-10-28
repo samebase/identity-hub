@@ -34,8 +34,12 @@ npx convex run --prod identityBroker:createApp '{"name":"Bristol","firstParty":t
 npx convex run --prod identityBroker:mintRegistrationToken '{"appId":"bristol-ab12c"}'
 ```
 
-Give the token to the app's CI. Each deployment of the app registers itself with it; see the
-component's
+A token expires after 30 days; `expiresInDays` in the arguments sets another lifetime. Every new
+preview deployment spends the token once, so CI holds a long-lived one.
+
+Give the token to the app's CI as a secret. Each deployment of the app registers itself with it
+through the `IdentityHub.Client` resource of `@samebase/alchemy-identity-hub` in its Alchemy stack,
+which also writes the client into the deployment's variables; see the component's
 [consumer guide](https://github.com/samebase/identity-broker/blob/main/docs/consumers.md).
 
 ## License
