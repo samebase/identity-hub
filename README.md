@@ -1,7 +1,7 @@
 # identity-hub
 
 The sign-in hub of the Samebase team on [Convex](https://convex.dev): one deployment that holds the
-team's GitHub, Google and email connections once and signs users in to all its apps, through the
+team's Google connection once and signs users in to all its apps, through the
 [identity-broker](https://github.com/samebase/identity-broker) component. It keeps no user accounts;
 each app creates its own user from the `id_token` it gets.
 
@@ -23,10 +23,11 @@ cannot sign in on one, since only the production callback is registered at Googl
    [Cloudflare Email Sending](https://developers.cloudflare.com/email-service/); and
    `CLOUDFLARE_EMAIL_ACCOUNT_ID`, that account; and `GOOGLE_CLIENT_ID` with `GOOGLE_CLIENT_SECRET`,
    the team's Google OAuth client. Without the Convex token the workflow deploys nothing and says
-   so.
+   so. The two Cloudflare secrets leave with the next pull request, once this one has deployed: the
+   stack removes variables before the push, and the deployment's current config still requires them.
 2. The stack hands the email token, the account id, and the sender `EMAIL_FROM` from
-   `alchemy.run.ts` to the deployment it pushes: no email variable is set by hand. The hub sends
-   each code once and keeps no copy of it.
+   `alchemy.run.ts` to the deployment it pushes, until that next pull request; the Google client the
+   same way, for good: no connector variable is set by hand.
 3. Create the keys of production once, by hand, with the Convex CLI login:
    `pnpm run keys:init --prod` writes `IDENTITY_BROKER_KEYS`, the signing key and the pairwise salt,
    and refuses a deployment that has the variable. Every deploy then checks the variable before the
@@ -50,11 +51,12 @@ ids, the clients and the salt stay, so the subjects do not change.
 
 ## Connectors
 
-`convex/connectors.ts` lists them: email codes and Google. Google uses the team's OAuth client,
-`GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET` as repository secrets that the stack hands to every
-deployment, and that client's redirect URIs must include `<issuer>/connectors/google/callback`.
-Another provider is one more wrapper line, its variables declared in `convex/convex.config.ts` and
-handed down the same way.
+`convex/connectors.ts` lists them: Google. It uses the team's OAuth client, `GOOGLE_CLIENT_ID` and
+`GOOGLE_CLIENT_SECRET` as repository secrets that the stack hands to the deployment, and that
+client's redirect URIs must include `<issuer>/connectors/google/callback`. Another provider is one
+more wrapper line, its variables declared in `convex/convex.config.ts` and handed down the same way;
+the broker's `email()` wrapper adds email codes, with a sender behind it and the abuse controls a
+public mail endpoint needs.
 
 ## Register an app
 
