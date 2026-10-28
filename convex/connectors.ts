@@ -5,7 +5,7 @@ import { env } from "./_generated/server";
  * The connectors this hub offers. Add a provider by appending its wrapper, with the credentials
  * read from the deployment's env, and register `<issuer>/connectors/<name>/callback` with it:
  *
- *   github({ clientId: () => env.GITHUB_CLIENT_ID, clientSecret: () => env.GITHUB_CLIENT_SECRET })
+ *   github({ clientId: () => env.AUTH_GITHUB_CLIENT_ID, clientSecret: () => env.AUTH_GITHUB_CLIENT_SECRET })
  *
  * Any other OAuth 2.0 or OpenID Connect provider is an `oauth` or `oidc` connector with its
  * endpoints copied in.
@@ -18,5 +18,8 @@ export const connectors: Connector[] = [
   // The team's GitHub login OAuth App, whose callback URL is https://samebase.com/: GitHub matches
   // a redirect by host with subdomains and by path prefix, so <issuer>/connectors/github/callback
   // on auth.samebase.com passes without a second app.
-  github({ clientId: () => env.GITHUB_CLIENT_ID, clientSecret: () => env.GITHUB_CLIENT_SECRET }),
+  github({
+    clientId: () => env.AUTH_GITHUB_CLIENT_ID,
+    clientSecret: () => env.AUTH_GITHUB_CLIENT_SECRET,
+  }),
 ];

@@ -52,8 +52,8 @@ export default Alchemy.Stack(
     const env = {
       GOOGLE_CLIENT_ID: yield* Config.String("GOOGLE_CLIENT_ID"),
       GOOGLE_CLIENT_SECRET: yield* Config.Redacted("GOOGLE_CLIENT_SECRET"),
-      GITHUB_CLIENT_ID: yield* Config.String("GITHUB_CLIENT_ID"),
-      GITHUB_CLIENT_SECRET: yield* Config.Redacted("GITHUB_CLIENT_SECRET"),
+      AUTH_GITHUB_CLIENT_ID: yield* Config.String("AUTH_GITHUB_CLIENT_ID"),
+      AUTH_GITHUB_CLIENT_SECRET: yield* Config.Redacted("AUTH_GITHUB_CLIENT_SECRET"),
     };
     // The project is kept on destroy: it holds the hub's registrations and the key set. A project
     // with this name that the stack did not create is taken over with `alchemy deploy --adopt`.

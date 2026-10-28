@@ -19,8 +19,8 @@ cannot sign in on one, since only the production callback is registered at Googl
 
 1. In the repository, set five secrets: `CONVEX_ACCESS_TOKEN`, the team's Convex access token, with
    which the run mints the deploy key itself; `GOOGLE_CLIENT_ID` with `GOOGLE_CLIENT_SECRET`, the
-   team's Google OAuth client; and `GITHUB_CLIENT_ID` with `GITHUB_CLIENT_SECRET`, the team's GitHub
-   login OAuth App. Without the Convex token the workflow deploys nothing and says so.
+   team's Google OAuth client; and `AUTH_GITHUB_CLIENT_ID` with `AUTH_GITHUB_CLIENT_SECRET`, the
+   team's GitHub login OAuth App. Without the Convex token the workflow deploys nothing and says so.
 2. The stack hands both clients from `alchemy.run.ts` to the deployment it pushes: no connector
    variable is set by hand.
 3. Create the keys of production once, by hand, with the Convex CLI login:
@@ -49,12 +49,12 @@ ids, the clients and the salt stay, so the subjects do not change.
 `convex/connectors.ts` lists them: Google and GitHub. Google uses the team's OAuth client,
 `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET` as repository secrets that the stack hands to the
 deployment, and that client's redirect URIs must include `<issuer>/connectors/google/callback`.
-GitHub uses the team's login OAuth App the same way, `GITHUB_CLIENT_ID` and `GITHUB_CLIENT_SECRET`;
-its one callback URL is `https://samebase.com/`, which GitHub matches by host with subdomains and by
-path prefix, so `<issuer>/connectors/github/callback` on the hub's subdomain passes. Another
-provider is one more wrapper line, its variables declared in `convex/convex.config.ts` and handed
-down the same way; the broker's `email()` wrapper adds email codes, with a sender behind it and the
-abuse controls a public mail endpoint needs.
+GitHub uses the team's login OAuth App the same way, `AUTH_GITHUB_CLIENT_ID` and
+`AUTH_GITHUB_CLIENT_SECRET`; its one callback URL is `https://samebase.com/`, which GitHub matches
+by host with subdomains and by path prefix, so `<issuer>/connectors/github/callback` on the hub's
+subdomain passes. Another provider is one more wrapper line, its variables declared in
+`convex/convex.config.ts` and handed down the same way; the broker's `email()` wrapper adds email
+codes, with a sender behind it and the abuse controls a public mail endpoint needs.
 
 ## Register an app
 
