@@ -5,18 +5,19 @@ minimumReleaseAgeStrict: true
 minimumReleaseAgeIgnoreMissingTime: false
 # Keep release-age exceptions exact so later releases do not bypass the cooling period.
 minimumReleaseAgeExclude:
-  # Reviewed first-party release, published 2026-10-28 from samebase/identity-broker main.
+  # Reviewed first-party release, published 2026-10-28 by samebase/identity-broker release.yml.
   # Remove after 2026-11-04, when the 7-day cooling period is complete.
-  - "@samebase/identity-broker@0.1.0"
+  - "@samebase/identity-broker@0.2.0"
+  # Reviewed first-party release: the Alchemy provider that deploys this hub and keeps its state in
+  # the team store, published 2026-10-27 15:18 UTC. Remove after 2026-11-03 15:19 UTC.
+  - "@samebase/alchemy-convex@0.11.0"
+  # Reviewed releases: the Alchemy that alchemy-convex 0.11.0 needs, published 2026-10-24 00:43 UTC.
+  # Remove after 2026-10-31 00:44 UTC.
+  - "alchemy@2.0.0-beta.84"
+  - "@alchemy.run/node-utils@2.0.0-beta.84"
+  - "@alchemy.run/github@2.0.0-beta.84"
 # Decided here, because pnpm in CI refuses an install with undecided build scripts.
 allowBuilds:
   esbuild: true
   core-js-pure: false
   workerd: false
-# @effect/platform-node 4.0.4 resolves its -shared package to 4.0.5, which needs effect 4.0.5, and
-# then @effect/platform-node fails to load. Pin -shared to the installed effect.
-overrides:
-  "@effect/platform-node@4.0.4>@effect/platform-node-shared": "4.0.4"
-peerDependencyRules:
-  allowedVersions:
-    "@samebase/alchemy-convex": "0.3.0"
