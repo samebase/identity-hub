@@ -16,6 +16,18 @@ minimumReleaseAgeExclude:
   - "alchemy@2.0.0-beta.84"
   - "@alchemy.run/node-utils@2.0.0-beta.84"
   - "@alchemy.run/github@2.0.0-beta.84"
+  - "@alchemy.run/cloudflare@2.0.0-beta.84"
+  # The packages the Cloudflare provider of beta.84 brings in, published 2026-10-24 04:03 UTC and
+  # 2026-10-23 23:08 UTC at the latest. Remove after 2026-10-31 04:04 UTC.
+  - "@alchemy.run/acme@2.0.0-beta.84"
+  - "@alchemy.run/cloudflare-runtime@2.0.0-beta.84"
+  - "@alchemy.run/docker@2.0.0-beta.84"
+  - "@alchemy.run/sql@2.0.0-beta.84"
+  - "@distilled.cloud/acme@1.0.0-rc.17"
+  - "@distilled.cloud/aws4signer@1.0.0-rc.17"
+  - "@distilled.cloud/cloudflare@1.0.0-rc.17"
+  - "@distilled.cloud/core@1.0.0-rc.17"
+  - "@distilled.cloud/iceberg@1.0.0-rc.17"
 # Decided here, because pnpm in CI refuses an install with undecided build scripts.
 allowBuilds:
   esbuild: true
