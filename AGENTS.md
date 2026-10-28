@@ -9,4 +9,4 @@ README.md. The component's own rules live in its repository.
   `convex/crons.ts` runs the cleanup.
 - `alchemy.run.ts` owns the Convex project; `scripts/ensure-keys.ts` creates the key set once.
 - Never use the U+2014 em dash character. No `any`, no type assertions except `as const`.
-- `pnpm install`, `pnpm exec convex codegen`, then `pnpm run check`.
+- `pnpm install`, then `pnpm run check`. `convex/_generated` is committed; `npx convex dev --once` refreshes it.
