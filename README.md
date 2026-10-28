@@ -81,8 +81,9 @@ The admin functions are internal: `npx convex run --prod identityBroker:<name>`.
 the hub is an administrator credential (it can read and replace the keys and run every internal
 function); keep it out of every app's CI. The Convex CLI ignores `--prod` when `CONVEX_DEPLOY_KEY`
 names another deployment, so unset it before an admin command. A cron runs the broker's cleanup
-daily: expired requests and codes, preview clients idle for 30 days, sign-in records older than 90
-days.
+daily: expired requests and codes, and sign-in records older than 90 days. Idle preview clients are
+kept: the broker prunes them only when the host sets `previewClientIdleDays`, and this hub does not,
+because a consumer's registration resource does not register a pruned client again.
 
 ## License
 
