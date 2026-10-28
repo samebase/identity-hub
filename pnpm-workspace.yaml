@@ -16,7 +16,7 @@ allowBuilds:
 # @effect/platform-node 4.0.4 resolves its -shared package to 4.0.5, which needs effect 4.0.5, and
 # then @effect/platform-node fails to load. Pin -shared to the installed effect.
 overrides:
-  "@effect/platform-node-shared": "4.0.4"
+  "@effect/platform-node@4.0.4>@effect/platform-node-shared": "4.0.4"
 peerDependencyRules:
   allowedVersions:
     "@samebase/alchemy-convex": "0.3.0"

@@ -56,5 +56,4 @@ export declare const internal: FilterApi<
 
 export declare const components: {
   identityBroker: import("@samebase/identity-broker/_generated/component.js").ComponentApi<"identityBroker">;
-  mail: import("@samebase/convex-cloudflare-email-inbox/_generated/component.js").ComponentApi<"mail">;
 };

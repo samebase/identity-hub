@@ -62,6 +62,8 @@ jobs:
           cache: pnpm
       - name: Install dependencies without lifecycle scripts
         run: pnpm install --frozen-lockfile --ignore-scripts
+      # A same-repository branch runs this plan with the account tokens; a fork gets none.
+      # Anyone who can push a branch here can run a plan, so write access is the boundary.
       - name: Plan the stack
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}

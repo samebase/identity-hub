@@ -1,30 +1,68 @@
-import { EmailInbox } from "@samebase/convex-cloudflare-email-inbox";
+import { BaseEmailSending } from "cloudflare/resources/email-sending/email-sending";
+import { createClient } from "cloudflare/tree-shakable";
 import { v } from "convex/values";
-import { components } from "./_generated/api";
 import { env, internalAction } from "./_generated/server";
 
-const inbox = new EmailInbox(components.mail, {
-  defaultInbox: { address: env.EMAIL_FROM, label: "Sign-in codes", senderName: "Sign in" },
-});
+const record = (value: unknown): Record<string, unknown> =>
+  typeof value === "object" && value !== null ? Object.fromEntries(Object.entries(value)) : {};
 
-/** Delivers one sign-in code. The broker calls this and never sees how the mail goes out. */
+const stringList = (source: Record<string, unknown>, name: string) => {
+  const value = source[name];
+  const items: unknown[] = Array.isArray(value) ? value : [];
+  return items.filter((item) => typeof item === "string");
+};
+
+/**
+ * The receipt of Cloudflare Email Sending, from
+ * https://developers.cloudflare.com/email-service/api/send-emails/rest-api/#response.
+ * Only the fields this hub reads; anything else in the body is ignored.
+ */
+function readReceipt(body: unknown) {
+  const receipt = record(body);
+  const result = record(receipt["result"]);
+  return {
+    success: receipt["success"] === true,
+    delivered: stringList(result, "delivered"),
+    queued: stringList(result, "queued"),
+    permanentBounces: stringList(result, "permanent_bounces"),
+    suppressed: stringList(result, "suppressed_recipients"),
+  };
+}
+
+/**
+ * Delivers one sign-in code, directly through Cloudflare Email Sending. The broker calls this and
+ * never sees how the mail goes out. Nothing is stored: a code is a secret for ten minutes, so no
+ * sent-mail history keeps it. The code is in the body only, not the subject. A recipient that
+ * Cloudflare reports as bounced or suppressed fails the send, which the broker shows as a delivery
+ * error; a queued recipient counts as sent, because Cloudflare delivers it when its queue clears.
+ */
 export const sendCode = internalAction({
   args: { to: v.string(), code: v.string(), appName: v.string() },
   returns: v.null(),
-  handler: async (ctx, args) => {
-    if (!env.CLOUDFLARE_EMAIL_ACCOUNT_ID || !env.CLOUDFLARE_EMAIL_API_TOKEN) {
-      throw new Error(
-        "CLOUDFLARE_EMAIL_ACCOUNT_ID and CLOUDFLARE_EMAIL_API_TOKEN are not set on this deployment",
-      );
-    }
-    const outcome = await inbox.send(ctx, {
-      to: [args.to],
-      subject: `${args.code} is your ${args.appName} sign-in code`,
-      text: `Your ${args.appName} sign-in code is ${args.code}. It expires in ten minutes. If you did not ask for it, ignore this email.`,
-      idempotencyKey: crypto.randomUUID(),
+  handler: async (_ctx, args) => {
+    const client = createClient({
+      resources: [BaseEmailSending],
+      apiToken: env.CLOUDFLARE_EMAIL_API_TOKEN,
+      maxRetries: 0,
+      timeout: 30_000,
+      logLevel: "off",
     });
-    if (outcome.kind === "rejected" || outcome.kind === "unknown") {
-      throw new Error(`Email delivery ${outcome.kind}`);
+    const response = await client.emailSending
+      .send({
+        account_id: env.CLOUDFLARE_EMAIL_ACCOUNT_ID,
+        from: { address: env.EMAIL_FROM, name: "Sign in" },
+        to: [args.to],
+        subject: `Your ${args.appName} sign-in code`,
+        text: `Your ${args.appName} sign-in code is ${args.code}. It expires in ten minutes. If you did not ask for it, ignore this email.`,
+      })
+      .asResponse();
+    const receipt = readReceipt(await response.json());
+    const sent = receipt.delivered.includes(args.to) || receipt.queued.includes(args.to);
+    if (!response.ok || !receipt.success || !sent) {
+      // The status and the counts name no address and no code.
+      throw new Error(
+        `Email delivery failed: status ${response.status}, delivered ${receipt.delivered.length}, queued ${receipt.queued.length}, bounced ${receipt.permanentBounces.length}, suppressed ${receipt.suppressed.length}`,
+      );
     }
     return null;
   },

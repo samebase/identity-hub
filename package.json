@@ -11,8 +11,8 @@
     "lint": "vp lint"
   },
   "dependencies": {
-    "@samebase/convex-cloudflare-email-inbox": "0.3.0",
     "@samebase/identity-broker": "0.1.0",
+    "cloudflare": "7.2.0",
     "convex": "1.47.0"
   },
   "devDependencies": {
