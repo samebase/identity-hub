@@ -7,10 +7,9 @@
 // of the team.
 //
 // Every run needs the team token CONVEX_ACCESS_TOKEN, or a Convex CLI login (`npx convex login`)
-// on a laptop; it mints the deploy key itself. Every run also reads CLOUDFLARE_EMAIL_API_TOKEN, a
-// Cloudflare account token limited to Email Sending, and CLOUDFLARE_EMAIL_ACCOUNT_ID, and hands
-// them with the sender address to the deployment: no email variable is ever set by hand. It reads
-// GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET the same way, for the Google connector.
+// on a laptop; it mints the deploy key itself. Every run also reads GOOGLE_CLIENT_ID and
+// GOOGLE_CLIENT_SECRET and hands them to the deployment, for the Google connector: no connector
+// variable is ever set by hand.
 //   pnpm exec alchemy deploy --stage prod
 import { execFileSync } from "node:child_process";
 import * as Convex from "@samebase/alchemy-convex";
@@ -21,8 +20,6 @@ import * as Effect from "effect/Effect";
 
 /** The Convex team that holds the project and the state. */
 const team = "nicu";
-/** The sender of the sign-in codes, on a domain verified with Cloudflare Email Sending. */
-const EMAIL_FROM = "auth@samebase.com";
 
 /** The GitHub repository, `owner/name`: GITHUB_REPOSITORY in Actions, else the origin remote. */
 const repository =
@@ -50,12 +47,9 @@ export default Alchemy.Stack(
       // The push inputs besides the functions, package.json, and the lockfile.
       include: ["scripts/**", "tsconfig*.json"],
     } satisfies Convex.Source;
-    // The variables of the deployment. The token is a prop, so the state store holds it next to
-    // the deployment it serves; it can only send email.
+    // The variables of the deployment. The secret is a prop, so the state store holds it next to
+    // the deployment it serves.
     const env = {
-      CLOUDFLARE_EMAIL_ACCOUNT_ID: yield* Config.String("CLOUDFLARE_EMAIL_ACCOUNT_ID"),
-      CLOUDFLARE_EMAIL_API_TOKEN: yield* Config.Redacted("CLOUDFLARE_EMAIL_API_TOKEN"),
-      EMAIL_FROM,
       GOOGLE_CLIENT_ID: yield* Config.String("GOOGLE_CLIENT_ID"),
       GOOGLE_CLIENT_SECRET: yield* Config.Redacted("GOOGLE_CLIENT_SECRET"),
     };
