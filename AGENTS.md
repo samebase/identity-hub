@@ -6,8 +6,7 @@ README.md. The component's own rules live in its repository.
 - `convex/connectors.ts` lists the providers the hub offers. A provider that needs credentials also
   gets its variables declared in `convex/convex.config.ts`.
 - `convex/http.ts` mounts the broker; `convex/identityBroker.ts` exports the admin functions for
-  `npx convex run`; `convex/email.ts` sends the codes through Cloudflare Email Sending with the
-  token the stack mints; `convex/crons.ts` runs the cleanup.
+  `npx convex run`; `convex/crons.ts` runs the cleanup.
 - `alchemy.run.ts` is the stack (project, production deployment, push); `scripts/check-keys.ts`
   checks the key set inside the `deploy` script the push runs and never creates it;
   `scripts/init-keys.ts` creates it once, by hand.

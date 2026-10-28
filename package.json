@@ -13,7 +13,6 @@
   },
   "dependencies": {
     "@samebase/identity-broker": "0.4.0",
-    "cloudflare": "7.2.0",
     "convex": "1.47.0"
   },
   "devDependencies": {

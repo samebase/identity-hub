@@ -4,7 +4,7 @@ import { v } from "convex/values";
 
 // A push fails while a required variable is missing. scripts/check-keys.ts checks
 // IDENTITY_BROKER_KEYS before each deploy and scripts/init-keys.ts creates it once by hand; the
-// stack hands the email and Google variables to every deployment.
+// stack hands the Google variables to the deployment.
 const app = defineApp({
   env: {
     /** The key set and the pairwise salt: `npx identity-broker keys`. */
@@ -12,16 +12,8 @@ const app = defineApp({
     /** The issuer URL once a custom domain exists. Without it, the deployment's own convex.site URL. */
     ISSUER: v.optional(v.string()),
     /**
-     * Cloudflare Email Sending, for the email code connector: the account and a token with the
-     * Email Sending permission on it. Required, because email is the connector every hub has.
-     */
-    CLOUDFLARE_EMAIL_ACCOUNT_ID: v.string(),
-    CLOUDFLARE_EMAIL_API_TOKEN: v.string(),
-    /** The sender of the codes, on a domain verified with Cloudflare Email Sending. */
-    EMAIL_FROM: v.string(),
-    /**
      * The Google OAuth client of the team, whose redirect URIs include
-     * `<issuer>/connectors/google/callback`. The stack hands both to every deployment.
+     * `<issuer>/connectors/google/callback`. The stack hands both to the deployment.
      */
     GOOGLE_CLIENT_ID: v.string(),
     GOOGLE_CLIENT_SECRET: v.string(),

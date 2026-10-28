@@ -194,9 +194,6 @@ importers:
       '@samebase/identity-broker':
         specifier: 0.4.0
         version: 0.4.0(convex@1.47.0)
-      cloudflare:
-        specifier: 7.2.0
-        version: 7.2.0
       convex:
         specifier: 1.47.0
         version: 1.47.0
@@ -1305,10 +1302,6 @@ packages:
     resolution: {integrity: sha512-TQMmc3w+5AxjpL8iIiwebF73dRDF4fBIieAqGn9RGCWaEVwQ6Fb2cGe31Yns0RRIzii5goJ1Y7xbMwo1TxMplw==}
     engines: {node: '>= 20.19.0'}
 
-  cloudflare@7.2.0:
-    resolution: {integrity: sha512-Y0ieFi/VOGsUeJmOWwuzztTQZ5HgvNqa7I6IaGBf9wS4Q2xjNmRfyHls741HlveI4DSTribs7YHaTjhKvNcRsw==}
-    hasBin: true
-
   convert-source-map@2.0.0:
     resolution: {integrity: sha512-Kvp459HrV2FEJ1CAsi1Ku+MY3kasH19TFykTz2xWmMeq6bk2NU3XXvfJ+Q61m0xktWwt+1HSYf3JZsTms3aRJg==}
 
@@ -2346,8 +2339,6 @@ snapshots:
   chokidar@5.0.0:
     dependencies:
       readdirp: 5.1.1
-
-  cloudflare@7.2.0: {}
 
   convert-source-map@2.0.0: {}
 
