@@ -15,9 +15,8 @@ import { env } from "./_generated/server";
 // wrapper is one line away when a hub wants it.
 export const connectors: Connector[] = [
   google({ clientId: () => env.GOOGLE_CLIENT_ID, clientSecret: () => env.GOOGLE_CLIENT_SECRET }),
-  // The team's GitHub login OAuth App, whose callback URL is https://samebase.com/: GitHub matches
-  // a redirect by host with subdomains and by path prefix, so <issuer>/connectors/github/callback
-  // on auth.samebase.com passes without a second app.
+  // The team's GitHub login OAuth App, which lists <issuer>/connectors/github/callback among its
+  // redirect URIs (an OAuth App takes up to ten), so no second app is needed.
   github({
     clientId: () => env.AUTH_GITHUB_CLIENT_ID,
     clientSecret: () => env.AUTH_GITHUB_CLIENT_SECRET,
