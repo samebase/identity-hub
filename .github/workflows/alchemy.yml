@@ -67,9 +67,11 @@ jobs:
         if:
           steps.keys.outputs.skip != 'true' && github.event_name != 'pull_request' && github.ref ==
           'refs/heads/main'
-        run: pnpm exec alchemy deploy --stage "$STAGE" --yes --no-input $ADOPT
+        run: |
+          if [ "$ADOPT" = "true" ]; then set -- --adopt; fi
+          pnpm exec alchemy deploy --stage "$STAGE" --yes --no-input "$@"
         env:
-          ADOPT: ${{ inputs.adopt && '--adopt' || '' }}
+          ADOPT: ${{ inputs.adopt }}
           CONVEX_ACCESS_TOKEN: ${{ secrets.CONVEX_ACCESS_TOKEN }}
       - name: Deploy the preview
         if:
