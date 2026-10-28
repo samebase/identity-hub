@@ -6,19 +6,19 @@
 // after `name`. The state of every stage is in the `alchemy-state` project of the team.
 //
 // Every run needs the team token CONVEX_ACCESS_TOKEN, or a Convex CLI login (`npx convex login`)
-// on a laptop; it mints the deploy key itself. It also needs the Cloudflare login, CLOUDFLARE_API_TOKEN
-// with "Account API Tokens Write" and CLOUDFLARE_ACCOUNT_ID, because each stage mints its own
-// Cloudflare API token limited to Email Sending and hands it to its deployment with the account id
-// and the sender address: no email variable is ever set by hand, on production or on a preview.
+// on a laptop; it mints the deploy key itself. Every run also reads CLOUDFLARE_EMAIL_API_TOKEN, a
+// Cloudflare account token limited to Email Sending, and CLOUDFLARE_EMAIL_ACCOUNT_ID, and hands
+// them with the sender address to every deployment it pushes, production and previews alike: no
+// email variable is ever set by hand.
 //   pnpm exec alchemy deploy --stage prod
 import { execFileSync } from "node:child_process";
-import * as Cloudflare from "@alchemy.run/cloudflare";
 import * as GitHub from "@alchemy.run/github";
 import * as Convex from "@samebase/alchemy-convex";
 import * as Alchemy from "alchemy";
 import { adopt } from "alchemy/AdoptPolicy";
 import * as Output from "alchemy/Output";
 import * as RemovalPolicy from "alchemy/RemovalPolicy";
+import * as Config from "effect/Config";
 import * as Effect from "effect/Effect";
 import * as Layer from "effect/Layer";
 
@@ -41,7 +41,7 @@ const projectName = repository.slice(repository.indexOf("/") + 1);
 export default Alchemy.Stack(
   repository,
   {
-    providers: Layer.mergeAll(Cloudflare.providers(), GitHub.providers(), Convex.providers()),
+    providers: Layer.mergeAll(GitHub.providers(), Convex.providers()),
     state: Convex.state({ team }),
   },
   Effect.gen(function* () {
@@ -52,24 +52,11 @@ export default Alchemy.Stack(
       // The push inputs besides the functions, package.json, and the lockfile.
       include: ["scripts/**", "tsconfig*.json"],
     } satisfies Convex.Source;
-
-    // The Cloudflare account of the login: it holds the verified sender domain, and the token
-    // below lives in it. The token can only send email; the hub stores it as a deployment variable.
-    const { accountId } = yield* yield* Cloudflare.CloudflareEnvironment;
-    const emailToken = yield* Cloudflare.ApiToken.AccountApiToken("EmailToken", {
-      name: `${repository} ${stage} email sending`,
-      accountId,
-      policies: [
-        {
-          effect: "allow",
-          permissionGroups: ["Email Sending Write"],
-          resources: { [`com.cloudflare.api.account.${accountId}`]: "*" },
-        },
-      ],
-    });
+    // The email variables of every deployment. The token is a prop, so the state store holds it
+    // next to the deployment it serves; it can only send email.
     const env = {
-      CLOUDFLARE_EMAIL_ACCOUNT_ID: accountId,
-      CLOUDFLARE_EMAIL_API_TOKEN: emailToken.value,
+      CLOUDFLARE_EMAIL_ACCOUNT_ID: yield* Config.String("CLOUDFLARE_EMAIL_ACCOUNT_ID"),
+      CLOUDFLARE_EMAIL_API_TOKEN: yield* Config.Redacted("CLOUDFLARE_EMAIL_API_TOKEN"),
       EMAIL_FROM,
     };
 
