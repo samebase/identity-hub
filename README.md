@@ -19,12 +19,13 @@ request, is a preview deployment named after the stage, which `alchemy destroy` 
 `pr-<number>` with a comment that names the preview's URL, and destroys that stage when the pull
 request closes.
 
-1. In the repository, set three secrets: `CONVEX_ACCESS_TOKEN`, the team's Convex access token, with
+1. In the repository, set five secrets: `CONVEX_ACCESS_TOKEN`, the team's Convex access token, with
    which the run mints the deploy key itself; `CLOUDFLARE_EMAIL_API_TOKEN`, a Cloudflare account
    token limited to "Email Sending Write" on the account that holds the verified sender domain of
    [Cloudflare Email Sending](https://developers.cloudflare.com/email-service/); and
-   `CLOUDFLARE_EMAIL_ACCOUNT_ID`, that account. Without the Convex token the workflow deploys
-   nothing and says so.
+   `CLOUDFLARE_EMAIL_ACCOUNT_ID`, that account; and `GOOGLE_CLIENT_ID` with `GOOGLE_CLIENT_SECRET`,
+   the team's Google OAuth client. Without the Convex token the workflow deploys nothing and says
+   so.
 2. The stack hands the email token, the account id, and the sender `EMAIL_FROM` from
    `alchemy.run.ts` to every deployment it pushes, production and previews alike: no email variable
    is set by hand. The hub sends each code once and keeps no copy of it.
@@ -46,9 +47,11 @@ ids, the clients and the salt stay, so the subjects do not change.
 
 ## Connectors
 
-`convex/connectors.ts` lists them. Email codes are on from the start. Add GitHub or Google with the
-credentials of an OAuth client whose callback is `<issuer>/connectors/<name>/callback`, declared as
-variables in `convex/convex.config.ts` and read in `convex/connectors.ts`.
+`convex/connectors.ts` lists them: email codes and Google. Google uses the team's OAuth client,
+`GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET` as repository secrets that the stack hands to every
+deployment, and that client's redirect URIs must include `<issuer>/connectors/google/callback`.
+Another provider is one more wrapper line, its variables declared in `convex/convex.config.ts` and
+handed down the same way.
 
 ## Register an app
 

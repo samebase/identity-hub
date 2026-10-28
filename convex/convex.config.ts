@@ -18,6 +18,12 @@ const app = defineApp({
     CLOUDFLARE_EMAIL_API_TOKEN: v.string(),
     /** The sender of the codes, on a domain verified with Cloudflare Email Sending. */
     EMAIL_FROM: v.string(),
+    /**
+     * The Google OAuth client of the team, whose redirect URIs include
+     * `<issuer>/connectors/google/callback`. The stack hands both to every deployment.
+     */
+    GOOGLE_CLIENT_ID: v.string(),
+    GOOGLE_CLIENT_SECRET: v.string(),
   },
 });
 

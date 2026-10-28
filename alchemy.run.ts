@@ -9,7 +9,8 @@
 // on a laptop; it mints the deploy key itself. Every run also reads CLOUDFLARE_EMAIL_API_TOKEN, a
 // Cloudflare account token limited to Email Sending, and CLOUDFLARE_EMAIL_ACCOUNT_ID, and hands
 // them with the sender address to every deployment it pushes, production and previews alike: no
-// email variable is ever set by hand.
+// email variable is ever set by hand. It reads GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET the same
+// way, for the Google connector.
 //   pnpm exec alchemy deploy --stage prod
 import { execFileSync } from "node:child_process";
 import * as GitHub from "@alchemy.run/github";
@@ -58,6 +59,8 @@ export default Alchemy.Stack(
       CLOUDFLARE_EMAIL_ACCOUNT_ID: yield* Config.String("CLOUDFLARE_EMAIL_ACCOUNT_ID"),
       CLOUDFLARE_EMAIL_API_TOKEN: yield* Config.Redacted("CLOUDFLARE_EMAIL_API_TOKEN"),
       EMAIL_FROM,
+      GOOGLE_CLIENT_ID: yield* Config.String("GOOGLE_CLIENT_ID"),
+      GOOGLE_CLIENT_SECRET: yield* Config.Redacted("GOOGLE_CLIENT_SECRET"),
     };
 
     // The stage `prod` owns the project and keeps it on destroy: it holds the hub's registrations

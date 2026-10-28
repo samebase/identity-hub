@@ -81,6 +81,8 @@ jobs:
           CONVEX_ACCESS_TOKEN: ${{ secrets.CONVEX_ACCESS_TOKEN }}
           CLOUDFLARE_EMAIL_API_TOKEN: ${{ secrets.CLOUDFLARE_EMAIL_API_TOKEN }}
           CLOUDFLARE_EMAIL_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_EMAIL_ACCOUNT_ID }}
+          GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
+          GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
       - name: Deploy the preview
         if:
           steps.keys.outputs.skip != 'true' && github.event_name == 'pull_request' &&
@@ -90,6 +92,8 @@ jobs:
           CONVEX_ACCESS_TOKEN: ${{ secrets.CONVEX_ACCESS_TOKEN }}
           CLOUDFLARE_EMAIL_API_TOKEN: ${{ secrets.CLOUDFLARE_EMAIL_API_TOKEN }}
           CLOUDFLARE_EMAIL_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_EMAIL_ACCOUNT_ID }}
+          GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
+          GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
           GITHUB_TOKEN: ${{ github.token }}
       # The stack reads the email values at plan time, on a destroy too.
       - name: Destroy the preview
@@ -99,4 +103,6 @@ jobs:
           CONVEX_ACCESS_TOKEN: ${{ secrets.CONVEX_ACCESS_TOKEN }}
           CLOUDFLARE_EMAIL_API_TOKEN: ${{ secrets.CLOUDFLARE_EMAIL_API_TOKEN }}
           CLOUDFLARE_EMAIL_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_EMAIL_ACCOUNT_ID }}
+          GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
+          GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
           GITHUB_TOKEN: ${{ github.token }}
