@@ -10,22 +10,24 @@ deployment variable or a line in `convex/connectors.ts`, so a copy of it runs an
 
 ## Deploy
 
-The Alchemy stack in `alchemy.run.ts` deploys the hub: the Convex project, its production
-deployment, a deploy key for that deployment only, the key set, and the push of the functions.
-GitHub Actions runs it on every push to `main` and plans it on every pull request
-(`.github/workflows/alchemy.yml`), as every app of the team does.
+`alchemy.run.ts` is the stack, in the shape of every app of the team: the stage `prod` is the
+production deployment of the Convex project named after this repository, and the push is the
+`deploy` package script, which creates the key set on a new deployment and pushes the functions. The
+state is in the `alchemy-state` project of the team. `.github/workflows/alchemy.yml` deploys each
+push to `main`; a pull request runs the checks only.
 
-1. In the repository, set the `CONVEX_TEAM_ID` variable and the `CONVEX_ACCESS_TOKEN`,
-   `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID` secrets: the team's Convex access token and
-   the Cloudflare account that holds the Alchemy state store. Without them the jobs skip.
+1. In the repository, set the secret `CONVEX_ACCESS_TOKEN`, the team's Convex access token. It is
+   the only secret: the run mints the deploy key itself. Without it the workflow deploys nothing and
+   says so.
 2. Set the email variables on the production deployment, from a domain verified with
    [Cloudflare Email Sending](https://developers.cloudflare.com/email-service/): the account id as
    `CLOUDFLARE_EMAIL_ACCOUNT_ID`, a token with the Email Sending permission on that account as
    `CLOUDFLARE_EMAIL_API_TOKEN`, and the sender address as `EMAIL_FROM`. A push fails while one is
    missing. The hub sends each code once and keeps no copy of it.
-3. Merge to `main`. The first deploy creates `IDENTITY_BROKER_KEYS`; every later deploy keeps it and
-   stops when the variable holds anything that is not a key set. From a laptop, `pnpm run deploy`
-   runs the same stack with the same values in `.env` and the Convex CLI login.
+3. Merge to `main`. The first run of the workflow on a project that exists already needs `adopt`
+   checked (Run workflow on the Actions tab). The first deploy creates `IDENTITY_BROKER_KEYS`; every
+   later deploy keeps it and stops when the variable holds anything that is not a key set. From a
+   laptop, `pnpm exec alchemy deploy --stage prod` runs the same stack with the Convex CLI login.
 
 Back up `IDENTITY_BROKER_KEYS` somewhere safe. It holds the signing keys and the pairwise salt: a
 hub that loses it issues new subjects to every user of every app.

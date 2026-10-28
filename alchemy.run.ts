@@ -1,83 +1,59 @@
-// The stack of this hub: the Convex project, its production deployment, a deploy key that works
-// only on that deployment, the key set, and the push of the functions. GitHub Actions runs it on
-// every push to main (.github/workflows/alchemy.yml); a laptop runs `pnpm run deploy`. Every step
-// reads an output of the step before it:
-// 1. The project and its production deployment. The stack takes an existing deployment over and
-//    never deletes it: its data is the hub's registrations.
-// 2. scripts/ensure-keys.ts, which writes IDENTITY_BROKER_KEYS when the deployment has none and
-//    keeps it otherwise. It runs on every deploy (`memo: false`).
-// 3. The push of the functions with the installed Convex CLI.
+// The stack of this hub, in the shape of samebase/base-alchemy. The stage `prod` is the production
+// deployment of the Convex project of this repository; the push is the `deploy` package script,
+// which creates the key set on a new deployment and pushes the functions. The stack is named after
+// the repository, `owner/name`, and its Convex project after `name`. The state of every stage is in
+// the `alchemy-state` project of the team. Every run needs the team token CONVEX_ACCESS_TOKEN, or a
+// Convex CLI login (`npx convex login`) on a laptop; it mints the deploy key itself:
+//   pnpm exec alchemy deploy --stage prod
+// The hub has no preview stages: a pull request runs the checks only.
+import { execFileSync } from "node:child_process";
 import * as Convex from "@samebase/alchemy-convex";
 import * as Alchemy from "alchemy";
-import * as Cloudflare from "alchemy/Cloudflare";
-import * as Command from "alchemy/Command";
-import * as Output from "alchemy/Output";
-import * as Config from "effect/Config";
+import * as RemovalPolicy from "alchemy/RemovalPolicy";
 import * as Effect from "effect/Effect";
-import * as Layer from "effect/Layer";
-import { deployNames } from "./scripts/deploy-names.ts";
 
-const names = deployNames();
+/** The Convex team that holds the project and the state. */
+const team = "nicu";
 
-const DEPLOY_KEY_ACTIONS = [
-  "deployment:deploy",
-  "deployment:env:view",
-  "deployment:env:write",
-  // A push that deletes an index or a component needs it.
-  "deployment:data:view",
-] as const;
+/** The GitHub repository, `owner/name`: GITHUB_REPOSITORY in Actions, else the origin remote. */
+const repository =
+  process.env["GITHUB_REPOSITORY"] ??
+  /[:/]([^/:]+\/[^/]+?)(?:\.git)?$/.exec(
+    execFileSync("git", ["remote", "get-url", "origin"], { encoding: "utf8" }).trim(),
+  )?.[1];
+if (repository === undefined) {
+  throw new Error("Set GITHUB_REPOSITORY to owner/name: the origin remote names no repository.");
+}
 
 export default Alchemy.Stack(
-  names.stack,
+  repository,
   {
-    providers: Layer.mergeAll(Cloudflare.providers(), Command.providers(), Convex.providers()),
-    // The Cloudflare state store: an encrypted Durable Object in the account, shared by the laptop
-    // and GitHub Actions.
-    state: Cloudflare.state(),
+    providers: Convex.providers(),
+    state: Convex.state({ team }),
   },
   Effect.gen(function* () {
     const { stage } = yield* Alchemy.Stack;
     if (stage !== "prod") {
       return yield* Effect.die(
-        new Error(`Stage "${stage}" is not prod. Deploy with --stage prod.`),
+        new Error(`Stage "${stage}" is not prod. The hub has one deployment: --stage prod.`),
       );
     }
-    // A project with this name that the stack did not create stops the deploy until
-    // `alchemy deploy --adopt`. A destroy keeps the project and the deployment.
+    // Retained on destroy: the project holds the hub's registrations and the key set. A project
+    // with this name that the stack did not create is taken over with `alchemy deploy --adopt`.
     const project = yield* Convex.Project("Project", {
-      team: yield* Config.Int("CONVEX_TEAM_ID"),
-      name: names.convexProject,
-    }).pipe(Alchemy.RemovalPolicy.retain());
-
+      team,
+      name: repository.slice(repository.indexOf("/") + 1),
+    }).pipe(RemovalPolicy.retain());
     const deployment = yield* Convex.Deployment("Deployment", {
-      projectId: project.projectId,
+      project,
       type: "prod",
-    }).pipe(Alchemy.RemovalPolicy.retain());
-
-    const key = yield* Convex.DeployKey("DeployKey", {
-      deployment: deployment.name,
-      name: "alchemy",
-      allowedActions: DEPLOY_KEY_ACTIONS,
+      source: {
+        path: "./convex",
+        command: ["node", "--run", "deploy"],
+        // The push inputs besides the functions, package.json, and the lockfile.
+        include: ["scripts/**", "tsconfig*.json"],
+      },
     });
-
-    const keys = yield* Command.Exec("Keys", {
-      command: "node ./scripts/ensure-keys.ts",
-      env: { CONVEX_DEPLOY_KEY: key.deployKey },
-      memo: false,
-    });
-
-    const code = yield* Convex.Code("Code", {
-      deployment,
-      deployKey: key.deployKey,
-      cwd: ".",
-      // The push waits for the key set: a deployment without IDENTITY_BROKER_KEYS refuses it.
-      command: Output.map(keys.hash, () => ["pnpm", "exec", "convex"] as const),
-    });
-
-    return {
-      convexProject: project.slug,
-      productionDeployment: deployment.name,
-      siteUrl: code.siteUrl,
-    };
+    return { url: deployment.siteUrl };
   }),
 );

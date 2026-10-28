@@ -8,7 +8,8 @@ README.md. The component's own rules live in its repository.
 - `convex/http.ts` mounts the broker; `convex/identityBroker.ts` exports the admin functions for
   `npx convex run`; `convex/email.ts` sends the codes through Cloudflare Email Sending;
   `convex/crons.ts` runs the cleanup.
-- `alchemy.run.ts` owns the Convex project; `scripts/ensure-keys.ts` creates the key set once.
+- `alchemy.run.ts` is the stack (project, production deployment, push); `scripts/ensure-keys.ts`
+  creates the key set once, inside the `deploy` script the push runs.
 - Never use the U+2014 em dash character. No `any`, no type assertions except `as const`.
 - `pnpm install`, then `pnpm run check`. `convex/_generated` is committed; `npx convex dev --once`
   refreshes it.
