@@ -192,8 +192,8 @@ importers:
   .:
     dependencies:
       '@samebase/identity-broker':
-        specifier: 0.4.0
-        version: 0.4.0(convex@1.47.0)
+        specifier: 0.6.0
+        version: 0.6.0(convex@1.47.0)
       convex:
         specifier: 1.47.0
         version: 1.47.0
@@ -869,8 +869,8 @@ packages:
       convex: ^1.48.0
       effect: ^4.0.5
 
-  '@samebase/identity-broker@0.4.0':
-    resolution: {integrity: sha512-AZUkTdFQtU/Qr9DBYoycVN5shQnjM5W4ffgPXnnS9WC39PK92OTwSRPkOKRDXUI8cM2xoigAReYtEb3MrZ7yVA==}
+  '@samebase/identity-broker@0.6.0':
+    resolution: {integrity: sha512-+52xzDDiiauRJIl1E47n3fUT4+Frf6A8jEaCri4qytP/CNr0sqAy6u4MhbfUllUSrmRt2zRoWXTDX5UGBEw5nA==}
     hasBin: true
     peerDependencies:
       convex: ^1.47.0
@@ -2050,7 +2050,7 @@ snapshots:
       convex: 1.47.0
       effect: 4.0.5
 
-  '@samebase/identity-broker@0.4.0(convex@1.47.0)':
+  '@samebase/identity-broker@0.6.0(convex@1.47.0)':
     dependencies:
       convex: 1.47.0
       jose: 6.2.13
