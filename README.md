@@ -1,7 +1,7 @@
 # identity-hub
 
 The sign-in hub of the Samebase team on [Convex](https://convex.dev): one deployment that holds the
-team's Google connection once and signs users in to all its apps, through the
+team's Google and GitHub connections once and signs users in to all its apps, through the
 [identity-broker](https://github.com/samebase/identity-broker) component. It keeps no user accounts;
 each app creates its own user from the `id_token` it gets.
 
@@ -17,11 +17,11 @@ production deployment of the Convex project named after this repository, and the
 cannot sign in on one, since only the production callback is registered at Google.
 `.github/workflows/alchemy.yml` deploys each push to `main`; pull requests run the checks only.
 
-1. In the repository, set three secrets: `CONVEX_ACCESS_TOKEN`, the team's Convex access token, with
-   which the run mints the deploy key itself, and `GOOGLE_CLIENT_ID` with `GOOGLE_CLIENT_SECRET`,
-   the team's Google OAuth client. Without the Convex token the workflow deploys nothing and says
-   so.
-2. The stack hands the Google client from `alchemy.run.ts` to the deployment it pushes: no connector
+1. In the repository, set five secrets: `CONVEX_ACCESS_TOKEN`, the team's Convex access token, with
+   which the run mints the deploy key itself; `GOOGLE_CLIENT_ID` with `GOOGLE_CLIENT_SECRET`, the
+   team's Google OAuth client; and `AUTH_GITHUB_CLIENT_ID` with `AUTH_GITHUB_CLIENT_SECRET`, the
+   team's GitHub login OAuth App. Without the Convex token the workflow deploys nothing and says so.
+2. The stack hands both clients from `alchemy.run.ts` to the deployment it pushes: no connector
    variable is set by hand.
 3. Create the keys of production once, by hand, with the Convex CLI login:
    `pnpm run keys:init --prod` writes `IDENTITY_BROKER_KEYS`, the signing key and the pairwise salt,
@@ -46,12 +46,14 @@ ids, the clients and the salt stay, so the subjects do not change.
 
 ## Connectors
 
-`convex/connectors.ts` lists them: Google. It uses the team's OAuth client, `GOOGLE_CLIENT_ID` and
-`GOOGLE_CLIENT_SECRET` as repository secrets that the stack hands to the deployment, and that
-client's redirect URIs must include `<issuer>/connectors/google/callback`. Another provider is one
-more wrapper line, its variables declared in `convex/convex.config.ts` and handed down the same way;
-the broker's `email()` wrapper adds email codes, with a sender behind it and the abuse controls a
-public mail endpoint needs.
+`convex/connectors.ts` lists them: Google and GitHub. Google uses the team's OAuth client,
+`GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET` as repository secrets that the stack hands to the
+deployment, and that client's redirect URIs must include `<issuer>/connectors/google/callback`.
+GitHub uses the team's login OAuth App the same way, `AUTH_GITHUB_CLIENT_ID` and
+`AUTH_GITHUB_CLIENT_SECRET`; that app lists `<issuer>/connectors/github/callback` among its redirect
+URIs, exact, next to Samebase's own. Another provider is one more wrapper line, its variables
+declared in `convex/convex.config.ts` and handed down the same way; the broker's `email()` wrapper
+adds email codes, with a sender behind it and the abuse controls a public mail endpoint needs.
 
 ## Register an app
 
