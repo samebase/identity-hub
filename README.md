@@ -19,16 +19,15 @@ request, is a preview deployment named after the stage, which `alchemy destroy` 
 `pr-<number>` with a comment that names the preview's URL, and destroys that stage when the pull
 request closes.
 
-1. In the repository, set the secret `CONVEX_ACCESS_TOKEN`, the team's Convex access token. It is
-   the only secret: the run mints the deploy key itself. Without it the workflow deploys nothing and
-   says so.
-2. Set the email variables on the production deployment, from a domain verified with
-   [Cloudflare Email Sending](https://developers.cloudflare.com/email-service/): the account id as
-   `CLOUDFLARE_EMAIL_ACCOUNT_ID`, a token with the Email Sending permission on that account as
-   `CLOUDFLARE_EMAIL_API_TOKEN`, and the sender address as `EMAIL_FROM`. A push fails while one is
-   missing. Set the same three as the preview defaults of the project (Convex dashboard, project
-   settings, default environment variables), so every preview can send codes too. The hub sends each
-   code once and keeps no copy of it.
+1. In the repository, set three secrets: `CONVEX_ACCESS_TOKEN`, the team's Convex access token, with
+   which the run mints the deploy key itself; `CLOUDFLARE_EMAIL_API_TOKEN`, a Cloudflare account
+   token limited to "Email Sending Write" on the account that holds the verified sender domain of
+   [Cloudflare Email Sending](https://developers.cloudflare.com/email-service/); and
+   `CLOUDFLARE_EMAIL_ACCOUNT_ID`, that account. Without the Convex token the workflow deploys
+   nothing and says so.
+2. The stack hands the email token, the account id, and the sender `EMAIL_FROM` from
+   `alchemy.run.ts` to every deployment it pushes, production and previews alike: no email variable
+   is set by hand. The hub sends each code once and keeps no copy of it.
 3. Merge to `main`. The first run of the workflow on a project that exists already needs `adopt`
    checked (Run workflow on the Actions tab). The first deploy creates `IDENTITY_BROKER_KEYS`; every
    later deploy keeps it and stops when the variable holds anything that is not a key set. From a

@@ -1,10 +1,11 @@
 // Writes IDENTITY_BROKER_KEYS to the selected Convex deployment when it has none. The stack
-// (alchemy.run.ts) runs it before the push with the deployment's deploy key, so a fresh deployment never pushes without keys and an
-// existing one never has its keys replaced: a present value is parsed and kept, a malformed one
-// stops the deploy. A new key set also means a new pairwise salt, which changes every subject the
-// hub ever issued, so nothing here regenerates. Rotation is `identity-broker keys --rotate` by hand.
+// (alchemy.run.ts) runs it before the push with the deployment's deploy key, so a fresh deployment
+// never pushes without keys and an existing one never has its keys replaced: a present value is
+// parsed by the broker's own parser and kept, a malformed or empty one stops the deploy. A new key
+// set also means a new pairwise salt, which changes every subject the hub ever issued, so nothing
+// here regenerates. Rotation is `identity-broker keys --rotate` by hand.
 /// <reference types="node" />
-import { createKeySet } from "@samebase/identity-broker";
+import { createKeySet, parseKeySet } from "@samebase/identity-broker";
 import { spawn } from "node:child_process";
 import process from "node:process";
 import { fileURLToPath } from "node:url";
@@ -37,13 +38,11 @@ function runConvex(args: string[], options: { input?: string } = {}) {
 
 async function main(selection: string[]) {
   const current = await runConvex(["env", "get", "IDENTITY_BROKER_KEYS", ...selection]);
-  const value = current.stdout.trim();
+  const value = current.stdout.replace(/\n$/, "");
   if (value.length > 0) {
-    // A value that is not a JSON object stops the deploy here instead of at the first sign-in.
-    const keySet: unknown = JSON.parse(value);
-    if (typeof keySet !== "object" || keySet === null || !("keys" in keySet)) {
-      throw new Error("IDENTITY_BROKER_KEYS is set but is not a key set. Restore it from backup.");
-    }
+    // Throws on anything that is not a key set, which stops the deploy here instead of at the
+    // first sign-in. Nothing here ever replaces a present value.
+    parseKeySet(value);
     console.log("IDENTITY_BROKER_KEYS is set.");
     return;
   }
@@ -56,5 +55,5 @@ async function main(selection: string[]) {
 }
 
 // Everything after the script name selects the deployment: `--prod`, `--deployment <name>`, or
-// nothing for the development deployment of this checkout.
+// nothing for the deployment of CONVEX_DEPLOY_KEY or of this checkout.
 await main(process.argv.slice(2));
