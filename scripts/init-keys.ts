@@ -3,8 +3,8 @@
 // a wrong value is restored from the backup by hand, never replaced here, and a second run never
 // mints a second salt. Run it once per deployment, never from two places at the same time.
 //
-//   pnpm run keys:init -- --prod
-//   pnpm run keys:init -- --deployment <name>
+//   pnpm run keys:init --prod
+//   pnpm run keys:init --deployment <name>
 /// <reference types="node" />
 import { createKeySet } from "@samebase/identity-broker";
 import process from "node:process";
