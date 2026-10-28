@@ -12,7 +12,7 @@
   },
   "dependencies": {
     "@samebase/convex-cloudflare-email-inbox": "0.3.0",
-    "@samebase/identity-broker": "file:vendor/samebase-identity-broker-0.1.0.tgz",
+    "@samebase/identity-broker": "0.1.0",
     "convex": "1.47.0"
   },
   "devDependencies": {
