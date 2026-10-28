@@ -17,17 +17,12 @@ production deployment of the Convex project named after this repository, and the
 cannot sign in on one, since only the production callback is registered at Google.
 `.github/workflows/alchemy.yml` deploys each push to `main`; pull requests run the checks only.
 
-1. In the repository, set five secrets: `CONVEX_ACCESS_TOKEN`, the team's Convex access token, with
-   which the run mints the deploy key itself; `CLOUDFLARE_EMAIL_API_TOKEN`, a Cloudflare account
-   token limited to "Email Sending Write" on the account that holds the verified sender domain of
-   [Cloudflare Email Sending](https://developers.cloudflare.com/email-service/); and
-   `CLOUDFLARE_EMAIL_ACCOUNT_ID`, that account; and `GOOGLE_CLIENT_ID` with `GOOGLE_CLIENT_SECRET`,
+1. In the repository, set three secrets: `CONVEX_ACCESS_TOKEN`, the team's Convex access token, with
+   which the run mints the deploy key itself, and `GOOGLE_CLIENT_ID` with `GOOGLE_CLIENT_SECRET`,
    the team's Google OAuth client. Without the Convex token the workflow deploys nothing and says
-   so. The two Cloudflare secrets leave with the next pull request, once this one has deployed: the
-   stack removes variables before the push, and the deployment's current config still requires them.
-2. The stack hands the email token, the account id, and the sender `EMAIL_FROM` from
-   `alchemy.run.ts` to the deployment it pushes, until that next pull request; the Google client the
-   same way, for good: no connector variable is set by hand.
+   so.
+2. The stack hands the Google client from `alchemy.run.ts` to the deployment it pushes: no connector
+   variable is set by hand.
 3. Create the keys of production once, by hand, with the Convex CLI login:
    `pnpm run keys:init --prod` writes `IDENTITY_BROKER_KEYS`, the signing key and the pairwise salt,
    and refuses a deployment that has the variable. Every deploy then checks the variable before the
