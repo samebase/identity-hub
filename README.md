@@ -1,25 +1,31 @@
 # identity-hub
 
-Your team's sign-in hub on [Convex](https://convex.dev): one deployment that holds your GitHub,
-Google and email connections once and signs users in to all your apps, through the
+The sign-in hub of the Samebase team on [Convex](https://convex.dev): one deployment that holds the
+team's GitHub, Google and email connections once and signs users in to all its apps, through the
 [identity-broker](https://github.com/samebase/identity-broker) component. It keeps no user accounts;
 each app creates its own user from the `id_token` it gets.
 
-Fork this repository, deploy it, and point your apps at it.
+The repository is public and holds no secrets or team values: everything specific to a hub is a
+deployment variable or a line in `convex/connectors.ts`, so a copy of it runs another team's hub.
 
 ## Deploy
 
-1. Create the Convex project: `pnpm exec alchemy deploy --stage prod` with `CONVEX_TEAM_ID` and
-   `GITHUB_REPOSITORY=<owner>/<repo>` in `.env` and a Cloudflare API token for the state store.
+The Alchemy stack in `alchemy.run.ts` deploys the hub: the Convex project, its production
+deployment, a deploy key for that deployment only, the key set, and the push of the functions.
+GitHub Actions runs it on every push to `main` and plans it on every pull request
+(`.github/workflows/alchemy.yml`), as every app of the team does.
+
+1. In the repository, set the `CONVEX_TEAM_ID` variable and the `CONVEX_ACCESS_TOKEN`,
+   `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID` secrets: the team's Convex access token and
+   the Cloudflare account that holds the Alchemy state store. Without them the jobs skip.
 2. Set the email variables on the production deployment, from a domain verified with
    [Cloudflare Email Sending](https://developers.cloudflare.com/email-service/): the account id as
    `CLOUDFLARE_EMAIL_ACCOUNT_ID`, a token with the Email Sending permission on that account as
    `CLOUDFLARE_EMAIL_API_TOKEN`, and the sender address as `EMAIL_FROM`. A push fails while one is
    missing. The hub sends each code once and keeps no copy of it.
-3. `pnpm run deploy`: it creates `IDENTITY_BROKER_KEYS` on the first run, keeps it on every later
-   run, and stops when the variable holds anything that is not a key set. Then it pushes the
-   functions. For GitHub Actions, store a deploy key as the `CONVEX_DEPLOY_KEY` secret and set the
-   `CONVEX_DEPLOY_ENABLED` variable to `true`; only `main` deploys.
+3. Merge to `main`. The first deploy creates `IDENTITY_BROKER_KEYS`; every later deploy keeps it and
+   stops when the variable holds anything that is not a key set. From a laptop, `pnpm run deploy`
+   runs the same stack with the same values in `.env` and the Convex CLI login.
 
 Back up `IDENTITY_BROKER_KEYS` somewhere safe. It holds the signing keys and the pairwise salt: a
 hub that loses it issues new subjects to every user of every app.
