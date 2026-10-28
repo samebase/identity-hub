@@ -4,14 +4,14 @@
   "type": "module",
   "scripts": {
     "dev": "convex dev",
-    "deploy": "node ./scripts/ensure-keys.ts --prod && convex deploy --yes",
+    "deploy": "alchemy deploy --stage prod",
     "check": "vp fmt --check && vp lint && pnpm run typecheck",
     "typecheck": "tsc --project convex/tsconfig.json && tsc --project tsconfig.node.json",
     "format": "vp fmt",
     "lint": "vp lint"
   },
   "dependencies": {
-    "@samebase/identity-broker": "0.1.0",
+    "@samebase/identity-broker": "0.2.0",
     "cloudflare": "7.2.0",
     "convex": "1.47.0"
   },

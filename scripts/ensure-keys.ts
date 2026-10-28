@@ -1,5 +1,5 @@
-// Writes IDENTITY_BROKER_KEYS to the selected Convex deployment when it has none. The deploy
-// script runs it before `convex deploy`, so a fresh deployment never pushes without keys and an
+// Writes IDENTITY_BROKER_KEYS to the selected Convex deployment when it has none. The stack
+// (alchemy.run.ts) runs it before the push with the deployment's deploy key, so a fresh deployment never pushes without keys and an
 // existing one never has its keys replaced: a present value is parsed and kept, a malformed one
 // stops the deploy. A new key set also means a new pairwise salt, which changes every subject the
 // hub ever issued, so nothing here regenerates. Rotation is `identity-broker keys --rotate` by hand.
