@@ -12,7 +12,8 @@
     },
     {
       "groupName": "Routine updates",
-      "matchUpdateTypes": ["minor", "patch", "pin", "digest"]
+      "matchUpdateTypes": ["major", "minor", "patch", "pin", "pinDigest", "digest"]
     }
-  ]
+  ],
+  "separateMajorMinor": false
 }
