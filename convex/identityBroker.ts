@@ -1,4 +1,4 @@
-import { broker } from "./http";
+import { broker } from "./broker";
 
 // Administration for `npx convex run identityBroker:<name>`:
 //   createApp '{"name":"Bristol","firstParty":false}', for an app that is not the team's own
