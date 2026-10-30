@@ -32,8 +32,12 @@ export function runConvex(args: string[], options: { input?: string } = {}) {
   });
 }
 
-/** Whether the deployment has the variable at all. `env list` prints one NAME=value line each. */
+/**
+ * Whether the deployment has the variable at all. The names only: a plain `env list` prints values
+ * or names, by whether the CLI detects an AI agent, and a wrong answer here makes keys:init replace
+ * a key set.
+ */
 export async function hasVariable(name: string, selection: string[]) {
-  const listed = await runConvex(["env", "list", ...selection]);
-  return listed.stdout.split("\n").some((line) => line.startsWith(`${name}=`));
+  const listed = await runConvex(["env", "list", "--names-only", ...selection]);
+  return listed.stdout.split("\n").includes(name);
 }

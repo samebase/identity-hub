@@ -1,3 +1,4 @@
+import alchemyState from "@samebase/alchemy-convex/state/convex.config";
 import identityBroker from "@samebase/identity-broker/convex.config";
 import { defineApp } from "convex/server";
 import { v } from "convex/values";
@@ -9,7 +10,7 @@ const app = defineApp({
   env: {
     /** The key set and the pairwise salt: `npx identity-broker keys`. */
     IDENTITY_BROKER_KEYS: v.string(),
-    /** The issuer URL once a custom domain exists. Without it, the deployment's own convex.site URL. */
+    /** The issuer URL, which the stack sets. Without it, the deployment's own convex.site URL. */
     ISSUER: v.optional(v.string()),
     /**
      * The Google OAuth client of the team, whose redirect URIs include
@@ -28,5 +29,7 @@ const app = defineApp({
 });
 
 app.use(identityBroker);
+// Without a name, so that this base serves the rows that the seed of the store wrote.
+app.use(alchemyState);
 
 export default app;

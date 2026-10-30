@@ -6,15 +6,10 @@ minimumReleaseAgeIgnoreMissingTime: false
 # Keep release-age exceptions exact so later releases do not bypass the cooling period.
 minimumReleaseAgeExclude:
   # Published 2026-10-30. Remove on 2026-11-06, when it is older than the seven-day release age.
-  - "@samebase/alchemy-convex@0.13.0"
-  # Published 2026-10-29. Remove on 2026-11-05, when it is older than the seven-day release age.
-  - "@samebase/alchemy-convex@0.12.0"
+  - "@samebase/alchemy-convex@0.14.1"
   # Reviewed first-party release, published 2026-10-29 by samebase/identity-broker release.yml.
   # Remove after 2026-11-05, when the 7-day cooling period is complete.
   - "@samebase/identity-broker@0.6.1"
-  # Reviewed first-party release: the Alchemy provider that deploys this hub and keeps its state in
-  # the team store, published 2026-10-27 15:18 UTC. Remove after 2026-11-03 15:19 UTC.
-  - "@samebase/alchemy-convex@0.11.0"
   # Reviewed releases: the Alchemy that alchemy-convex 0.11.0 needs, published 2026-10-24 00:43 UTC.
   # Remove after 2026-10-31 00:44 UTC.
   - "alchemy@2.0.0-beta.84"

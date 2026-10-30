@@ -1,5 +1,5 @@
 {
-  "name": "identity-hub",
+  "name": "team-base",
   "private": true,
   "type": "module",
   "scripts": {
@@ -12,12 +12,12 @@
     "lint": "vp lint"
   },
   "dependencies": {
+    "@samebase/alchemy-convex": "0.14.1",
     "@samebase/identity-broker": "0.6.1",
-    "convex": "1.47.0"
+    "convex": "1.48.0"
   },
   "devDependencies": {
     "@effect/platform-node": "4.0.5",
-    "@samebase/alchemy-convex": "0.13.0",
     "@types/node": "24.19.2",
     "alchemy": "2.0.0-beta.84",
     "effect": "4.0.5",
