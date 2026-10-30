@@ -12,8 +12,6 @@ import type * as connectors from "../connectors.js";
 import type * as crons from "../crons.js";
 import type * as http from "../http.js";
 import type * as identityBroker from "../identityBroker.js";
-import type * as reader from "../reader.js";
-import type * as state from "../state.js";
 
 import type {
   ApiFromModules,
@@ -26,8 +24,6 @@ declare const fullApi: ApiFromModules<{
   crons: typeof crons;
   http: typeof http;
   identityBroker: typeof identityBroker;
-  reader: typeof reader;
-  state: typeof state;
 }>;
 
 /**
@@ -58,5 +54,4 @@ export declare const internal: FilterApi<
 
 export declare const components: {
   identityBroker: import("@samebase/identity-broker/_generated/component.js").ComponentApi<"identityBroker">;
-  alchemyState: import("@samebase/alchemy-convex/state/_generated/component.js").ComponentApi<"alchemyState">;
 };
