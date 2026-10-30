@@ -108,9 +108,9 @@ preview clients are kept: the broker prunes them only when the host sets `previe
 and this hub does not, because a consumer's registration resource does not register a pruned client
 again.
 
-Never run `npx convex import --replace-all` on this deployment, also not with `--component`: it
-also deletes the rows of the other components. To restore the tables of one component, import a ZIP
-of that component with `--component <name> --replace`.
+Never run `npx convex import --replace-all` on this deployment, also not with `--component`: it also
+deletes the rows of the other components. To restore the tables of one component, import a ZIP of
+that component with `--component <name> --replace`.
 
 ## License
 
