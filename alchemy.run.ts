@@ -51,7 +51,7 @@ export default Alchemy.Stack(
       path: "./convex",
       command: ["node", "--run", "deploy"],
       // The push inputs besides the functions, package.json, and the lockfile.
-      include: ["scripts/**", "tsconfig*.json"],
+      include: ["scripts/**", "tsconfig*.json", "src/**", "vite.config.ts"],
     } satisfies Convex.Source;
     // The variables of the deployment. The secret is a prop, so the state store holds it next to
     // the deployment it serves.
