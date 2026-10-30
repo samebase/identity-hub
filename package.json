@@ -12,7 +12,7 @@
     "lint": "vp lint"
   },
   "dependencies": {
-    "@samebase/alchemy-convex": "0.14.0",
+    "@samebase/alchemy-convex": "0.14.1",
     "@samebase/identity-broker": "0.6.1",
     "convex": "1.48.0"
   },

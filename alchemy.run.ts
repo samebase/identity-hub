@@ -6,9 +6,9 @@
 // the `deploy` package script, which checks the key set and pushes the functions.
 //
 // The stack is named after the repository, `owner/name`, as every stack of the team is. The
-// repository was `samebase/identity-hub`, and the rows of that old stack name the deployment that
-// this base replaces. This stack never reads those rows. The project and the deployment exist
-// already, and this stack did not create them, so both are adopted and retained. Adoption changes the variables of `env` and
+// repository was `samebase/identity-hub`, and this stack never reads the rows of that old stack.
+// The project and the deployment exist already, and this stack did not create them, so both are
+// adopted and retained. Adoption changes the variables of `env` and
 // the code; it leaves every other variable, the data, and the project as they are.
 //
 // Every run needs the team token CONVEX_ACCESS_TOKEN, or a Convex CLI login (`npx convex login`)
