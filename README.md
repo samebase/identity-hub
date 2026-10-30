@@ -15,10 +15,10 @@ another team's hub.
 `alchemy.run.ts` is the stack, in the shape of every app of the team with one stage: `prod` is the
 production deployment of the Convex project `samebase`, and the push is the `deploy` package script,
 which checks the key set and pushes the functions. The stack is named after the repository,
-`samebase/team-base`. Its state is in the Convex project `alchemy-state-store`, with the state of the
-other stacks of the team. The hub has no previews: no app points at one, and Google cannot sign in on one,
-since only the production callback is registered at Google. `.github/workflows/alchemy.yml` deploys
-each push to `main`; pull requests run the checks only.
+`samebase/team-base`. Its state is in the Convex project `alchemy-state-store`, with the state of
+the other stacks of the team. The hub has no previews: no app points at one, and Google cannot sign
+in on one, since only the production callback is registered at Google.
+`.github/workflows/alchemy.yml` deploys each push to `main`; pull requests run the checks only.
 
 1. In the repository, set five secrets: `CONVEX_ACCESS_TOKEN`, the team's Convex access token, with
    which the run mints the deploy key itself; `GOOGLE_CLIENT_ID` with `GOOGLE_CLIENT_SECRET`, the
@@ -96,12 +96,11 @@ that selects the project `samebase`. The deploy key of the hub is an administrat
 can read and replace the keys and run every internal function. Every stack of the team mints keys of
 the hub with the team's Convex token, for its hub client. These keys can run internal functions
 only, and they end with the run. The team token itself reaches the hub, so treat it as an
-administrator credential too. The
-Convex CLI ignores `--prod` when `CONVEX_DEPLOY_KEY` names another deployment, so unset it before an
-admin command. A cron runs the broker's cleanup daily: expired requests and codes, and sign-in
-records older than 90 days. Idle preview clients are kept: the broker prunes them only when the host
-sets `previewClientIdleDays`, and this hub does not, because a consumer's `Convex.HubClient` does
-not register a pruned client again.
+administrator credential too. The Convex CLI ignores `--prod` when `CONVEX_DEPLOY_KEY` names another
+deployment, so unset it before an admin command. A cron runs the broker's cleanup daily: expired
+requests and codes, and sign-in records older than 90 days. Idle preview clients are kept: the
+broker prunes them only when the host sets `previewClientIdleDays`, and this hub does not, because a
+consumer's `Convex.HubClient` does not register a pruned client again.
 
 Never run `npx convex import --replace-all` on this deployment, also not with `--component`: it also
 deletes the rows of the other components. To restore the tables of one component, import a ZIP of

@@ -1,7 +1,7 @@
 # AGENTS.md
 
-A Convex app that mounts the identity-broker component: the sign-in hub of one team. See README.md. Each component's own rules live
-in its repository.
+A Convex app that mounts the identity-broker component: the sign-in hub of one team. See README.md.
+Each component's own rules live in its repository.
 
 - `convex/connectors.ts` lists the providers the hub offers. A provider that needs credentials also
   gets its variables declared in `convex/convex.config.ts`.
