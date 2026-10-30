@@ -12,8 +12,8 @@
     "lint": "vp lint"
   },
   "dependencies": {
-    "@samebase/alchemy-convex": "0.14.1",
-    "@samebase/identity-broker": "0.6.1",
+    "@samebase/alchemy-convex": "0.15.0",
+    "@samebase/identity-broker": "0.7.0",
     "convex": "1.48.0"
   },
   "devDependencies": {
