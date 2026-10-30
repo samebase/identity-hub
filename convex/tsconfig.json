@@ -11,7 +11,9 @@
     "noUncheckedSideEffectImports": true,
     "noImplicitReturns": true,
     "noImplicitOverride": true,
-    "noPropertyAccessFromIndexSignature": true,
+    /* The state functions of @samebase/alchemy-convex ship as TypeScript, so this project compiles
+     * them, and they read the claims of a UserIdentity with dot access. */
+    "noPropertyAccessFromIndexSignature": false,
     "noUncheckedIndexedAccess": false,
     "allowUnreachableCode": false,
     "allowUnusedLabels": false,
