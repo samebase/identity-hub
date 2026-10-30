@@ -25,11 +25,7 @@ function SignInPage() {
       });
       const result = await client.mutation(api.auth.signInWithPassword, { email, password });
       if (result.status === "error") {
-        setError(
-          result.userError.error === "RATE_LIMITED"
-            ? "Too many attempts. Try again later."
-            : "Incorrect email or password.",
-        );
+        setError("Incorrect email or password, or too many attempts.");
         return;
       }
       await setSession(result.tokens);

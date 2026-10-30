@@ -21,6 +21,21 @@ export default defineConfig({
       "typescript/no-deprecated": "error",
     },
   },
-  // Every page needs a session, so nothing prerenders.
-  plugins: [convexSsr(), convexAuth(), tailwindcss(), tanstackStart(), react()],
+  plugins: [
+    convexSsr(),
+    convexAuth(),
+    tailwindcss(),
+    // The sign-in page is the one page without a session: a file of the build, so that a visitor
+    // without a session never reaches the renderer (src/server.ts).
+    tanstackStart({
+      prerender: {
+        enabled: true,
+        autoStaticPathsDiscovery: false,
+        crawlLinks: false,
+        failOnError: true,
+      },
+      pages: [{ path: "/signin", prerender: { outputPath: "/signin/index.html" } }],
+    }),
+    react(),
+  ],
 });

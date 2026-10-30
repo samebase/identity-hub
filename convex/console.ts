@@ -4,11 +4,14 @@ import { env, query, type QueryCtx } from "./_generated/server";
 
 /**
 Every read of the console needs a session. A read token of `reader:authorize` is an identity too, for
-one repository, so the issuer decides: a session has the issuer of the auth component.
+one repository, so the issuer decides: a session has the issuer of the auth component. The account
+must still exist: deleting a row of `users` ends the access of its sessions at once.
 */
 async function requireSession(ctx: QueryCtx) {
   const identity = await ctx.auth.getUserIdentity();
-  if (identity === null || identity.issuer !== env.CONVEX_SITE_URL) {
+  const userId =
+    identity?.issuer === env.CONVEX_SITE_URL ? ctx.db.normalizeId("users", identity.subject) : null;
+  if (userId === null || (await ctx.db.get("users", userId)) === null) {
     throw new ConvexError("A session is required.");
   }
 }

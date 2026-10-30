@@ -10,6 +10,7 @@ const auth = setupConvexAuth({ component: components.auth });
 export const { signOut, refreshSession } = auth;
 
 const PROVIDER = "password";
+const FAILED = { status: "error", userError: { error: "INVALID_CREDENTIALS" } } as const;
 
 const vTokens = object({
   accessToken: string(),
@@ -39,9 +40,11 @@ export const linkExistingUser = internalMutation({
 });
 
 /**
-Signs in to an existing account. There is no sign-up: `authAdmin` creates accounts. A wrong password
-returns an error result instead of throwing, so the password component keeps the attempt in its
-per-user rate limit.
+Signs in to an existing account. There is no sign-up: `authAdmin` creates accounts. A failure
+returns a result instead of throwing, so the password component keeps the attempt in its limit of
+five attempts, then one per minute, for each account. Every failure gets the same answer, also the
+rate limit, which only an account that exists can reach: it would tell a caller that the email has
+an account.
 */
 export const signInWithPassword = mutation({
   args: { email: string(), password: string() },
@@ -49,7 +52,7 @@ export const signInWithPassword = mutation({
     object({ status: literal("complete"), tokens: vTokens }),
     object({
       status: literal("error"),
-      userError: object({ error: union(literal("INVALID_CREDENTIALS"), literal("RATE_LIMITED")) }),
+      userError: object({ error: literal("INVALID_CREDENTIALS") }),
     }),
   ),
   handler: async (ctx, args) => {
@@ -58,22 +61,14 @@ export const signInWithPassword = mutation({
       .withIndex("email", (q) => q.eq("email", normalizeEmail(args.email)))
       .unique();
     if (user === null) {
-      return { status: "error" as const, userError: { error: "INVALID_CREDENTIALS" as const } };
+      return FAILED;
     }
     const verification = await ctx.runMutation(components.authPassword.public.verifyPassword, {
       userId: user._id,
       password: args.password,
     });
     if (!verification.success) {
-      return {
-        status: "error" as const,
-        userError: {
-          error:
-            verification.userError.error === "RATE_LIMITED"
-              ? ("RATE_LIMITED" as const)
-              : ("INVALID_CREDENTIALS" as const),
-        },
-      };
+      return FAILED;
     }
     const claims = {
       providerName: PROVIDER,

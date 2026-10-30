@@ -4,8 +4,7 @@ import { generateKeyPairSync, randomUUID } from "node:crypto";
 import { fileURLToPath } from "node:url";
 
 // Creates the Convex Auth signing keys of the selected deployment once, before its push:
-// `pnpm run deploy` and `pnpm run deploy:dev` run this in their build, and `pnpm run dev` runs it
-// before `convex dev`. Alchemy's CONVEX_DEPLOY_KEY selects the production or preview deployment;
+// `pnpm run deploy` and `pnpm run deploy:dev` run this in their build. Alchemy's CONVEX_DEPLOY_KEY selects the production or preview deployment;
 // without one, CONVEX_DEPLOYMENT in .env.local selects the development deployment.
 //
 // An existing pair stays, so the deployment's sessions stay valid; one value without the other is

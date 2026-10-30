@@ -20,7 +20,8 @@ in its repository.
   the paths of the hub or of Convex Auth: `/authorize`, `/continue`, `/token`, `/userinfo`,
   `/connectors/*`, `/.well-known/*`, `/auth/*`.
 - The console has no sign-up. Run `authAdmin:createOrUpdatePasswordAccount` from the Functions page
-  of the Convex dashboard, with the email and password you choose, not in a terminal.
+  of the Convex dashboard, with the email and password you choose, not in a terminal. To end an
+  account's access at once, delete its row in `users`. A new password does not end its sessions.
 - `pnpm run deploy:dev` builds, uploads, and pushes to the development deployment. It must run once
   before `pnpm run dev`: `convex/http.ts` imports the build.
 - Never use `npx convex import --replace-all` on this deployment, also not with `--component`: it
