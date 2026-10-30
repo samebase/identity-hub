@@ -195,8 +195,8 @@ importers:
         specifier: 0.16.0
         version: 0.16.0(@effect/platform-node@4.0.6(effect@4.0.6)(redis@6.3.0))(alchemy@2.0.0-beta.84(@effect/platform-node@4.0.6(effect@4.0.6)(redis@6.3.0))(@voidzero-dev/vite-plus-core@1.4.0(@types/node@26.6.5)(esbuild@0.27.0)(typescript@7.0.2)(yaml@2.9.1))(effect@4.0.6)(ws@8.22.0))(convex@1.48.0)(effect@4.0.6)
       '@samebase/identity-broker':
-        specifier: 0.8.0
-        version: 0.8.0(convex@1.48.0)
+        specifier: 0.9.0
+        version: 0.9.0(convex@1.48.0)
       convex:
         specifier: 1.48.0
         version: 1.48.0
@@ -870,8 +870,8 @@ packages:
       convex: ^1.48.0
       effect: ^4.0.5
 
-  '@samebase/identity-broker@0.8.0':
-    resolution: {integrity: sha512-prYpngzUhXrfowJfRYX16TQWo1J+NZlhMXHRXkj9ardBFbkcAyAFhNLBn+ZTCqP7ycyRRx2Lmwmy6L/rDleCHA==}
+  '@samebase/identity-broker@0.9.0':
+    resolution: {integrity: sha512-PkeyiPbaJyQcVn67fQwpUWIEH5viF6WtrxGJVTrTaD6h+snqx9NVecWEFo07o6JQfOEluvYHuWttI2/HJ/XkHA==}
     hasBin: true
     peerDependencies:
       convex: ^1.47.0
@@ -2051,7 +2051,7 @@ snapshots:
       convex: 1.48.0
       effect: 4.0.6
 
-  '@samebase/identity-broker@0.8.0(convex@1.48.0)':
+  '@samebase/identity-broker@0.9.0(convex@1.48.0)':
     dependencies:
       convex: 1.48.0
       jose: 6.2.13
