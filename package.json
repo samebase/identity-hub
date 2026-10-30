@@ -13,7 +13,7 @@
   },
   "dependencies": {
     "@samebase/alchemy-convex": "0.16.0",
-    "@samebase/identity-broker": "0.8.0",
+    "@samebase/identity-broker": "0.9.0",
     "convex": "1.48.0"
   },
   "devDependencies": {
