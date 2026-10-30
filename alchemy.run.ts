@@ -5,10 +5,10 @@
 // cannot sign in on one, since only the production callback is registered at Google. The push is
 // the `deploy` package script, which checks the key set and pushes the functions.
 //
-// The stack name is a constant, so it does not follow the repository name, and it is not the old
-// stack `samebase/identity-hub`, whose rows name the deployment that this base replaces. This
-// stack never reads those rows. The project and the deployment exist already, and this stack did
-// not create them, so both are adopted and retained. Adoption changes the variables of `env` and
+// The stack is named after the repository, `owner/name`, as every stack of the team is. The
+// repository was `samebase/identity-hub`, and the rows of that old stack name the deployment that
+// this base replaces. This stack never reads those rows. The project and the deployment exist
+// already, and this stack did not create them, so both are adopted and retained. Adoption changes the variables of `env` and
 // the code; it leaves every other variable, the data, and the project as they are.
 //
 // Every run needs the team token CONVEX_ACCESS_TOKEN, or a Convex CLI login (`npx convex login`)
@@ -17,6 +17,7 @@
 // is ever set by hand. IDENTITY_BROKER_KEYS is not in `env`: it stays on the deployment, and the
 // `deploy` script stops when it is missing.
 //   pnpm exec alchemy deploy --stage prod
+import { execFileSync } from "node:child_process";
 import * as Convex from "@samebase/alchemy-convex";
 import * as Alchemy from "alchemy";
 import { adopt } from "alchemy/AdoptPolicy";
@@ -27,8 +28,18 @@ import * as Effect from "effect/Effect";
 /** The Convex team that holds the project and the state. */
 const team = "nicu";
 
+/** The GitHub repository, `owner/name`: GITHUB_REPOSITORY in Actions, else the origin remote. */
+const repository =
+  process.env["GITHUB_REPOSITORY"] ??
+  /[:/]([^/:]+\/[^/]+?)(?:\.git)?$/.exec(
+    execFileSync("git", ["remote", "get-url", "origin"], { encoding: "utf8" }).trim(),
+  )?.[1];
+if (repository === undefined) {
+  throw new Error("Set GITHUB_REPOSITORY to owner/name: the origin remote names no repository.");
+}
+
 export default Alchemy.Stack(
-  "samebase/identity-hub/base",
+  repository,
   { providers: Convex.providers(), state: Convex.state({ team }) },
   Effect.gen(function* () {
     const { stage } = yield* Alchemy.Stack;

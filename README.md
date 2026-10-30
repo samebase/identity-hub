@@ -1,4 +1,4 @@
-# identity-hub
+# team-base
 
 The base app of the Samebase team on [Convex](https://convex.dev): the code of the production
 deployment of the project `samebase`, which holds the team-level components.
@@ -17,11 +17,12 @@ another team's base.
 
 `alchemy.run.ts` is the stack, in the shape of every app of the team with one stage: `prod` is the
 production deployment of the Convex project `samebase`, and the push is the `deploy` package script,
-which checks the key set and pushes the functions. The stack is named `samebase/identity-hub/base`,
-a constant that does not follow the repository name. Its state is in the deployment that it deploys,
-next to the state of the other stacks of the team. The hub has no previews: no app points at one,
-and Google cannot sign in on one, since only the production callback is registered at Google.
-`.github/workflows/alchemy.yml` deploys each push to `main`; pull requests run the checks only.
+which checks the key set and pushes the functions. The stack is named after the repository,
+`samebase/team-base`, a constant that does not follow the repository name. Its state is in the
+deployment that it deploys, next to the state of the other stacks of the team. The hub has no
+previews: no app points at one, and Google cannot sign in on one, since only the production callback
+is registered at Google. `.github/workflows/alchemy.yml` deploys each push to `main`; pull requests
+run the checks only.
 
 1. In the repository, set five secrets: `CONVEX_ACCESS_TOKEN`, the team's Convex access token, with
    which the run mints the deploy key itself; `GOOGLE_CLIENT_ID` with `GOOGLE_CLIENT_SECRET`, the
