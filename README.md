@@ -1,25 +1,22 @@
 # team-base
 
-The base app of the Samebase team on [Convex](https://convex.dev): the code of the production
-deployment of the project `samebase`, which holds the team-level components.
-
-- `identityBroker`, from [identity-broker](https://github.com/samebase/identity-broker), is the
-  sign-in hub. It holds the team's Google and GitHub connections once and signs users in to all its
-  apps. It keeps no user accounts; each app creates its own user from the `id_token` it gets.
-- `alchemyState`, from [alchemy-convex](https://github.com/samebase/alchemy-convex), is the Alchemy
-  state of every stack of the team.
+The sign-in hub of the Samebase team on [Convex](https://convex.dev): the code of the production
+deployment of the project `samebase`. It mounts `identityBroker` from
+[identity-broker](https://github.com/samebase/identity-broker), holds the team's Google and GitHub
+connections once, and signs users in to all its apps. It keeps no user accounts; each app creates
+its own user from the `id_token` it gets.
 
 The repository is public and holds no secrets. The values of the team are the constants in
 `alchemy.run.ts` and the lines in `convex/connectors.ts`, so a copy of it with other values runs
-another team's base.
+another team's hub.
 
 ## Deploy
 
 `alchemy.run.ts` is the stack, in the shape of every app of the team with one stage: `prod` is the
 production deployment of the Convex project `samebase`, and the push is the `deploy` package script,
 which checks the key set and pushes the functions. The stack is named after the repository,
-`samebase/team-base`. Its state is in the deployment that it deploys, next to the state of the other
-stacks of the team. The hub has no previews: no app points at one, and Google cannot sign in on one,
+`samebase/team-base`. Its state is in the Convex project `alchemy-state-store`, with the state of the
+other stacks of the team. The hub has no previews: no app points at one, and Google cannot sign in on one,
 since only the production callback is registered at Google. `.github/workflows/alchemy.yml` deploys
 each push to `main`; pull requests run the checks only.
 
@@ -42,21 +39,6 @@ each push to `main`; pull requests run the checks only.
 Back up `IDENTITY_BROKER_KEYS` somewhere safe. It holds the signing keys and the pairwise salt: a
 hub that loses it issues new subjects to every user of every app. An established hub that lost the
 variable gets the backup restored by hand; its deploys stop until then.
-
-## Base and seed
-
-A push replaces every function of a deployment. `Convex.state()` of `@samebase/alchemy-convex`
-pushes a small store app, a seed, to a project `samebase` that has no base, and it never pushes over
-a base. Thus this app serves the same store functions as the seed: `convex/state.ts` with the host
-`base`, `convex/reader.ts`, and `convex/auth.config.ts`. The `alchemyState` component has no name in
-`convex/convex.config.ts`, so this app serves the rows that the seed wrote.
-
-The store version of this base is the store version of the `@samebase/alchemy-convex` in
-`package.json`. The stack and the app share that one pin. When the store version rises, this
-repository moves first and each consumer follows. A consumer of the team fails on a base that is
-older or newer than the consumer.
-
-Push a base for the first time when no stack of the team runs: the push of a seed has no lock.
 
 ## Issuer
 
@@ -96,7 +78,7 @@ const client =
   });
 ```
 
-The resource finds this base by the name of its project, and it runs `identityBroker:registerClient`
+The resource finds this hub by the name of its project, and it runs `identityBroker:registerClient`
 with a short-lived key that the Convex credential of the stack mints. So the app has no token of its
 own. The first client of an `app` creates the app as a first-party app, which sends the user
 straight to the connector without the chooser. For an app that is not the team's own, run
@@ -110,11 +92,11 @@ See the component's
 ## Operate
 
 The admin functions are internal: `npx convex run --prod identityBroker:<name>`, from a checkout
-that selects the project `samebase`. The deploy key of the base is an administrator credential: it
-can read and replace the keys, read every secret in the Alchemy state of the team, and run every
-internal function. Every stack of the team mints keys of the base with the team's Convex token, for
-its state and for its hub client. These keys can run internal functions only, and they end with the
-run. The team token itself reaches the base, so treat it as an administrator credential too. The
+that selects the project `samebase`. The deploy key of the hub is an administrator credential: it
+can read and replace the keys and run every internal function. Every stack of the team mints keys of
+the hub with the team's Convex token, for its hub client. These keys can run internal functions
+only, and they end with the run. The team token itself reaches the hub, so treat it as an
+administrator credential too. The
 Convex CLI ignores `--prod` when `CONVEX_DEPLOY_KEY` names another deployment, so unset it before an
 admin command. A cron runs the broker's cleanup daily: expired requests and codes, and sign-in
 records older than 90 days. Idle preview clients are kept: the broker prunes them only when the host
