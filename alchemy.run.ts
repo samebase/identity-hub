@@ -1,9 +1,8 @@
-// The stack of the team's base app, with one stage: `prod` is the production deployment of the
-// Convex project `samebase`, and nothing else is deployed. The base holds the team-level
-// components of that deployment: the sign-in hub (`identityBroker`) and the Alchemy state of every
-// stack of the team (`alchemyState`). The hub has no previews: no app points at one, and Google
-// cannot sign in on one, since only the production callback is registered at Google. The push is
-// the `deploy` package script, which checks the key set and pushes the functions.
+// The stack of the team's identity hub, with one stage: `prod` is the production deployment of the
+// Convex project `samebase`, and nothing else is deployed. The hub has no previews: no app points at
+// one, and Google cannot sign in on one, since only the production callback is registered at Google.
+// The push is the `deploy` package script, which checks the key set and pushes the functions. The
+// state of this stack is in the project `alchemy-state-store`, with the state of every other stack.
 //
 // The stack is named after the repository, `owner/name`, as every stack of the team is. The
 // repository was `samebase/identity-hub`, and this stack never reads the rows of that old stack.
@@ -51,7 +50,7 @@ export default Alchemy.Stack(
       path: "./convex",
       command: ["node", "--run", "deploy"],
       // The push inputs besides the functions, package.json, and the lockfile.
-      include: ["scripts/**", "tsconfig*.json", "src/**", "public/**", "vite.config.ts"],
+      include: ["scripts/**", "tsconfig*.json"],
     } satisfies Convex.Source;
     // The variables of the deployment. The secret is a prop, so the state store holds it next to
     // the deployment it serves.
