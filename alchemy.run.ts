@@ -28,7 +28,7 @@ import * as Effect from "effect/Effect";
 const team = "nicu";
 
 export default Alchemy.Stack(
-  "samebase/base",
+  "samebase/identity-hub/base",
   { providers: Convex.providers(), state: Convex.state({ team }) },
   Effect.gen(function* () {
     const { stage } = yield* Alchemy.Stack;

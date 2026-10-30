@@ -11,7 +11,7 @@ in its repository.
 - `convex/state.ts`, `convex/reader.ts`, and `convex/auth.config.ts` serve the Alchemy state store,
   from the exports of `@samebase/alchemy-convex`. A push replaces every function, so a function that
   leaves these files leaves every stack of the team without its state.
-- `alchemy.run.ts` is the stack `samebase/base` (adopted project, adopted production deployment,
+- `alchemy.run.ts` is the stack `samebase/identity-hub/base` (adopted project, adopted production deployment,
   push); `scripts/check-keys.ts` checks the key set inside the `deploy` script the push runs and
   never creates it; `scripts/init-keys.ts` creates it once, by hand.
 - Never use `npx convex import --replace-all` on this deployment, also not with `--component`: it
