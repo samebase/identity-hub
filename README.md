@@ -1,3 +1,5 @@
+# Moved to [samebase/samebase](https://github.com/samebase/samebase/tree/main/apps/identity-hub)
+
 # team-base
 
 The sign-in hub of the Samebase team on [Convex](https://convex.dev): the code of the production
