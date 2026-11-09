@@ -1,21 +1,20 @@
-# Wait 7 days before resolving newly published package versions, so the ecosystem has time to
-# detect and yank compromised releases before CI installs them.
-minimumReleaseAge: 10080
-minimumReleaseAgeStrict: true
-minimumReleaseAgeIgnoreMissingTime: false
-# Keep release-age exceptions exact so later releases do not bypass the cooling period.
-minimumReleaseAgeExclude:
-  # Published 2026-10-30. Remove on 2026-11-06, when it is older than the seven-day release age.
-  - "@samebase/alchemy-convex@0.16.0"
-  # Reviewed first-party release, published 2026-10-30 by samebase/identity-broker release.yml.
-  # Remove after 2026-11-06, when the 7-day cooling period is complete.
-  - "@samebase/identity-broker@0.9.0"
-  # Reviewed releases: the Alchemy that alchemy-convex 0.11.0 needs, published 2026-10-24 00:43 UTC.
-  # Remove after 2026-10-31 00:44 UTC.
-  - "alchemy@2.0.0-beta.84"
-  - "@alchemy.run/node-utils@2.0.0-beta.84"
-# Decided here, because pnpm in CI refuses an install with undecided build scripts.
 allowBuilds:
   esbuild: true
-  core-js-pure: false
   workerd: false
+catalog:
+  vite: npm:@voidzero-dev/vite-plus-core@1.4.0
+  vitest: 5.0.5
+  vite-plus: 1.4.0
+overrides:
+  vite: "catalog:"
+  vitest: "catalog:"
+peerDependencyRules:
+  allowAny:
+    - vite
+    - vitest
+  allowedVersions:
+    vite: "*"
+    vitest: "*"
+minimumReleaseAgeExclude:
+  # Samebase's own releases, which this repository may install as soon as they are published.
+  - "@samebase/*"

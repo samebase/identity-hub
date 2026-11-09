@@ -8,10 +8,10 @@
  * @module
  */
 
-import type * as connectors from "../connectors.js";
+import type * as broker from "../broker.js";
 import type * as crons from "../crons.js";
 import type * as http from "../http.js";
-import type * as identityBroker from "../identityBroker.js";
+import type * as owners from "../owners.js";
 
 import type {
   ApiFromModules,
@@ -20,10 +20,10 @@ import type {
 } from "convex/server";
 
 declare const fullApi: ApiFromModules<{
-  connectors: typeof connectors;
+  broker: typeof broker;
   crons: typeof crons;
   http: typeof http;
-  identityBroker: typeof identityBroker;
+  owners: typeof owners;
 }>;
 
 /**

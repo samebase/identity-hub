@@ -1,112 +1,132 @@
-# Moved to [samebase/samebase](https://github.com/samebase/samebase/tree/main/apps/identity-hub)
+# identity-hub
 
-# team-base
+A sign-in hub on [Convex](https://convex.dev): one place that holds a Google OAuth client and a
+GitHub OAuth App, and signs users in to every app that registers with it. It keeps no user accounts.
+Each app gets an OpenID Connect `id_token` and creates its own user from it. The hub is
+[`@samebase/identity-broker`](https://www.npmjs.com/package/@samebase/identity-broker) plus the
+settings of this repository.
 
-The sign-in hub of the Samebase team on [Convex](https://convex.dev): the code of the production
-deployment of the project `samebase`. It mounts `identityBroker` from
-[identity-broker](https://github.com/samebase/identity-broker), holds the team's Google and GitHub
-connections once, and signs users in to all its apps. It keeps no user accounts; each app creates
-its own user from the `id_token` it gets.
+Samebase runs this repository, unchanged, as its public hub. Apps made with
+[Samebase](https://samebase.com) sign in there. Use this template to run your own.
 
-The repository is public and holds no secrets. The values of the team are the constants in
-`alchemy.run.ts` and the lines in `convex/connectors.ts`, so a copy of it with other values runs
-another team's hub.
+## How it works
 
-## Deploy
+- An app registers in its own GitHub Actions run, with GitHub's OIDC token as proof of its
+  repository. No account at the hub is needed. `HUB_OWNERS` decides which repositories may register.
+- Each deployment of the app (production, a preview, a development checkout) gets its own client.
+- A user's `sub` is the provider's own id, `google:<id>` or `github:<id>`. It is the same at every
+  hub, so an app can move to another hub and keep its users.
 
-`alchemy.run.ts` is the stack, in the shape of every app of the team with one stage: `prod` is the
-production deployment of the Convex project `samebase`, and the push is the `deploy` package script,
-which checks the key set and pushes the functions. The stack is named after the repository,
-`samebase/team-base`. Its state is in the Convex project `alchemy-state-store`, with the state of
-the other stacks of the team. The hub has no previews: no app points at one, and Google cannot sign
-in on one, since only the production callback is registered at Google.
-`.github/workflows/alchemy.yml` deploys each push to `main`; pull requests run the checks only.
+## Start
 
-1. In the repository, set five secrets: `CONVEX_ACCESS_TOKEN`, the team's Convex access token, with
-   which the run mints the deploy key itself; `GOOGLE_CLIENT_ID` with `GOOGLE_CLIENT_SECRET`, the
-   team's Google OAuth client; and `AUTH_GITHUB_CLIENT_ID` with `AUTH_GITHUB_CLIENT_SECRET`, the
-   team's GitHub login OAuth App. Without the Convex token the workflow deploys nothing and says so.
-2. The stack hands both clients from `alchemy.run.ts` to the deployment it pushes: no connector
-   variable is set by hand.
-3. Create the keys of production once, by hand, with the Convex CLI login:
-   `pnpm run keys:init --prod` writes `IDENTITY_BROKER_KEYS`, the signing key and the pairwise salt,
-   and refuses a deployment that has the variable. Every deploy then checks the variable before the
-   push and stops when it is missing or holds anything that is not a key set; no deploy ever creates
-   or replaces it.
-4. Merge to `main`. The stack adopts the project and its production deployment, so no run needs
-   `--adopt`, and it retains both on destroy. Adoption replaces the code and sets the variables of
-   the stack. It does not change other variables, the data, or the project. From a laptop,
-   `pnpm exec alchemy deploy --stage prod` runs the same stack with the Convex CLI login.
+You need a Convex team, a Google Cloud project, and a GitHub account. The steps take about 15
+minutes.
 
-Back up `IDENTITY_BROKER_KEYS` somewhere safe. It holds the signing keys and the pairwise salt: a
-hub that loses it issues new subjects to every user of every app. An established hub that lost the
-variable gets the backup restored by hand; its deploys stop until then.
+1. **Create the repository** with "Use this template".
+2. **Set the settings** in the repository, Settings, Secrets and variables, Actions:
 
-## Issuer
+   | Name                          | Kind     | Value                                                                                                  |
+   | ----------------------------- | -------- | ------------------------------------------------------------------------------------------------------ |
+   | `CONVEX_ACCESS_TOKEN`         | secret   | A Convex team access token (Convex dashboard, team settings, Access Tokens).                           |
+   | `HUB_OWNERS`                  | variable | `any`, or the numeric ids of the GitHub accounts whose repositories may register, separated by commas. |
+   | `HUB_NAME`                    | variable | The name of your sign-in service, shown on the sign-in page.                                           |
+   | `HUB_TERMS_URL`               | variable | Your terms for the sign-in service.                                                                    |
+   | `HUB_PRIVACY_URL`             | variable | Your privacy notice for the sign-in service.                                                           |
+   | `HUB_PROJECT`                 | variable | Optional. The Convex project name. Default: the repository name.                                       |
+   | `IDENTITY_HUB_MODERATION_KEY` | secret   | Optional. A long random key for the `/moderation/*` API.                                               |
 
-The hub answers at the deployment's `.convex.site` URL and at the custom domain `auth.samebase.com`.
-The stack sets `ISSUER` to that domain: the issuer is the name every app trusts, in discovery, in
-every `id_token`, and in the callback URLs registered with GitHub and Google. Changing it later
-means changing `HUB_ISSUER` on every app's deployments and the callback URLs at every provider in
-one go; the app ids, the clients and the salt stay, so the subjects do not change. An app reads the
-issuer from the reply of its registration, so it needs no setting of its own.
+   A GitHub account's numeric id is at `https://api.github.com/users/<login>`, field `id`.
 
-## Connectors
+3. **Run the workflow once.** Actions, alchemy, Run workflow, on `main`. The run creates the Convex
+   project and an empty production deployment, and prints its `url` and `deployment` name. It pushes
+   no code yet. The stack never takes over a project that exists already: if the name is taken, the
+   run stops. Set `HUB_PROJECT` to another name and run it again.
+4. **Choose the issuer now.** It is the deployment's `url`, or a custom domain (see Custom domain).
+   Every app and both providers use it, so set it before the next steps.
+5. **Create the two clients**, with the issuer from step 4:
+   - Google Cloud console, Google Auth Platform, Clients: a Web application client with the redirect
+     URI `<issuer>/connectors/google/callback`. Publish the app and add your domain to the branding
+     when you open the hub to other people.
+   - GitHub, Settings, Developer settings, OAuth Apps: a new OAuth App with the callback URL
+     `<issuer>/connectors/github/callback`.
 
-`convex/connectors.ts` lists them: Google and GitHub. Google uses the team's OAuth client,
-`GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET` as repository secrets that the stack hands to the
-deployment, and that client's redirect URIs must include `<issuer>/connectors/google/callback`.
-GitHub uses the team's login OAuth App the same way, `AUTH_GITHUB_CLIENT_ID` and
-`AUTH_GITHUB_CLIENT_SECRET`; that app lists `<issuer>/connectors/github/callback` among its redirect
-URIs, exact, next to Samebase's own. Another provider is one more wrapper line, its variables
-declared in `convex/convex.config.ts` and handed down the same way; the broker's `email()` wrapper
-adds email codes, with a sender behind it and the abuse controls a public mail endpoint needs.
+   Set them as secrets: `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `AUTH_GITHUB_CLIENT_ID`,
+   `AUTH_GITHUB_CLIENT_SECRET`.
 
-## Register an app
+6. **Create the signing keys once,** from a clone of the repository:
 
-An app needs no step on the hub. Each deployment registers itself through the `Convex.HubClient`
-resource of `@samebase/alchemy-convex` in its Alchemy stack, which also writes the client into the
-deployment's variables:
+   ```sh
+   pnpm install
+   npx convex login
+   env -u CONVEX_DEPLOY_KEY pnpm run keys:init --deployment <deployment>
+   ```
+
+   Use the `deployment` name that step 3 printed. The script refuses a deployment that already has
+   keys. Back up the value it writes (`IDENTITY_BROKER_KEYS`) somewhere safe.
+
+7. **Run the workflow again.** This run pushes the hub. Check it:
+   `<issuer>/.well-known/openid-configuration` answers with your issuer.
+
+Every push to `main` deploys again. After you change a secret or a variable, run the workflow by
+hand: saving a secret does not start a run.
+
+## Custom domain
+
+Custom domains need a Convex plan that includes them. Add the domain in the Convex dashboard (the
+deployment, Settings, Custom Domains), point its DNS at Convex as the dashboard says, and wait until
+it serves HTTPS. Then set the variable `ISSUER` to `https://<domain>`, register the callbacks for
+that domain at Google and GitHub, and run the workflow.
+
+Do it before the first app registers. Changing the issuer later is a move: every app registers again
+and needs the new callbacks.
+
+## Connect an app
+
+An app made with Samebase's starter, [samebase/base](https://github.com/samebase/base), names its
+hub in `alchemy.run.ts`:
 
 ```ts
-const client =
-  yield *
-  Convex.HubClient("HubClient", {
-    team,
-    app: "bristol",
-    redirectUri: `${siteUrl}/oauth/hub/callback`,
-    deploymentType: "preview",
-    clientName: stage,
-  });
+const HUB = { issuer: "https://<your issuer>", terms: "<your HUB_TERMS_URL>" };
 ```
 
-The resource finds this hub by the name of its project, and it runs `identityBroker:registerClient`
-with a short-lived key that the Convex credential of the stack mints. So the app has no token of its
-own. The first client of an `app` creates the app as a first-party app, which sends the user
-straight to the connector without the chooser. For an app that is not the team's own, run
-`createApp` with `firstParty` false first. A development deployment has no stack: the command
-`alchemy-convex hub-client` does the same with the Convex CLI login. Deleting an app removes its
-clients. Recreating it with the same id keeps the subjects of its users.
-
-See the component's
-[consumer guide](https://github.com/samebase/identity-broker/blob/main/docs/consumers.md).
+Its next deploy registers its clients here. Any other app uses the `IdentityHub.Client` resource of
+[`@samebase/alchemy-convex`](https://www.npmjs.com/package/@samebase/alchemy-convex), with
+`connectors: ["google", "github"]`. The broker's
+[consumer guide](https://github.com/samebase/samebase/blob/main/packages/identity-broker/docs/consumers.md)
+has the details.
 
 ## Operate
 
-The admin functions are internal: `npx convex run --prod identityBroker:<name>`, from a checkout
-that selects the project `samebase`. The deploy key of the hub is an administrator credential: it
-can read and replace the keys and run every internal function. Every stack of the team mints keys of
-the hub with the team's Convex token, for its hub client. These keys can run internal functions
-only, and they end with the run. The team token itself reaches the hub, so treat it as an
-administrator credential too. The Convex CLI ignores `--prod` when `CONVEX_DEPLOY_KEY` names another
-deployment, so unset it before an admin command. A cron runs the broker's cleanup daily: expired
-requests and codes, and sign-in records older than 90 days. Idle preview clients are kept: the
-broker prunes them only when the host sets `previewClientIdleDays`, and this hub does not, because a
-consumer's `Convex.HubClient` does not register a pruned client again.
+- **Pause every app:** set `APPS_PAUSED=true` on the deployment (Convex dashboard, Environment
+  Variables). Remove it to resume.
+- **List and delete:** `npx convex run --deployment <deployment> broker:listApps`, then
+  `broker:listClients '{"appId":"..."}'`, `broker:deleteClient '{"clientId":"..."}'`,
+  `broker:deleteApp '{"appId":"..."}'`.
+- **Block a repository or an owner** at once, whatever `HUB_OWNERS` says:
 
-Never run `npx convex import --replace-all` on this deployment, also not with `--component`: it also
-deletes the rows of the other components. To restore the tables of one component, import a ZIP of
-that component with `--component <name> --replace`.
+  ```sh
+  curl -X POST <issuer>/moderation/blocks \
+    -H "Authorization: Bearer $IDENTITY_HUB_MODERATION_KEY" -H "Content-Type: application/json" \
+    -d '{"action":"block","kind":"repository","githubId":"<numeric id>","reason":"<why>","adminEmail":"<you>"}'
+  ```
+
+  `"kind":"owner"` blocks every repository of an account, and `"action":"unblock"` lifts a block.
+  The other endpoints are in the broker's
+  [moderation API](https://github.com/samebase/samebase/blob/main/packages/identity-broker/src/client/moderation.ts).
+
+- A daily cron removes expired requests, old sign-in records, and preview and development clients
+  that no deploy renewed for 14 days. A production client stays until you delete it.
+- A repository that changes owner stays under its last recorded owner until it registers again or
+  you block it.
+- The deploy key and `CONVEX_ACCESS_TOKEN` can read the signing keys. Treat both as administrator
+  credentials.
+- Never run `npx convex import --replace-all` on the hub: it also deletes the components' rows.
+
+## Upgrade
+
+Renovate opens a pull request when a new broker or alchemy-convex version is out. Read the
+[broker's changelog](https://github.com/samebase/samebase/blob/main/packages/identity-broker/CHANGELOG.md)
+before you merge: a release that changes stored data says what to do.
 
 ## License
 

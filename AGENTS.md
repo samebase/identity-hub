@@ -1,17 +1,17 @@
 # AGENTS.md
 
-A Convex app that mounts the identity-broker component: the sign-in hub of one team. See README.md.
-Each component's own rules live in its repository.
+An identity hub: a Convex app that mounts `@samebase/identity-broker`. See README.md.
 
-- `convex/connectors.ts` lists the providers the hub offers. A provider that needs credentials also
-  gets its variables declared in `convex/convex.config.ts`.
-- `convex/http.ts` mounts the broker; `convex/identityBroker.ts` exports the admin functions for
-  `npx convex run`; `convex/crons.ts` runs the cleanup.
-- `alchemy.run.ts` is the stack `samebase/team-base` (adopted project, adopted production
-  deployment, push); `scripts/check-keys.ts` checks the key set inside the `deploy` script the push
-  runs and never creates it; `scripts/init-keys.ts` creates it once, by hand.
-- Never use `npx convex import --replace-all` on this deployment, also not with `--component`: it
-  deletes the rows of the other components.
+- `convex/broker.ts` is the hub: connectors `google` and `github`, the registration policy (who may
+  register comes from `HUB_OWNERS`, parsed in `convex/owners.ts`), and the admin functions.
+  `convex/convex.config.ts` declares every deployment variable; `convex/http.ts` mounts the routes;
+  `convex/crons.ts` runs the cleanup.
+- Every value that differs between hubs is a GitHub variable or secret that `alchemy.run.ts` hands
+  to the deployment. Keep it that way: a copy of this repository changes settings, not code.
+- `alchemy.run.ts` creates the Convex project and its production deployment and never adopts one
+  (`adopt(false)` on both). Without the four client values it pushes nothing.
+- `scripts/init-keys.ts` creates `IDENTITY_BROKER_KEYS` once, by hand; `scripts/check-keys.ts`
+  checks it before every push and never creates it.
+- Never use `npx convex import --replace-all` on a hub: it deletes the rows of the components.
 - Never use the U+2014 em dash character. No `any`, no type assertions except `as const`.
-- `pnpm install`, then `pnpm run check`. `convex/_generated` is committed; `npx convex dev --once`
-  refreshes it.
+- `pnpm install`, then `pnpm run check`. `convex/_generated` is committed; a push refreshes it.

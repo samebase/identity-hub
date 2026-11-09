@@ -1,28 +1,31 @@
 {
-  "name": "team-base",
+  "name": "identity-hub",
   "private": true,
+  "license": "Apache-2.0",
   "type": "module",
   "scripts": {
-    "dev": "convex dev",
     "deploy": "node ./scripts/check-keys.ts && convex deploy --yes",
     "keys:init": "node ./scripts/init-keys.ts",
-    "check": "vp fmt --check && vp lint && pnpm run typecheck",
+    "check": "vp check && pnpm run typecheck && vp test",
     "typecheck": "tsc --project convex/tsconfig.json && tsc --project tsconfig.node.json",
     "format": "vp fmt",
-    "lint": "vp lint"
+    "lint": "vp lint --report-unused-disable-directives",
+    "test": "vp test"
   },
   "dependencies": {
-    "@samebase/alchemy-convex": "0.16.0",
-    "@samebase/identity-broker": "0.9.0",
+    "@samebase/identity-broker": "0.29.0",
     "convex": "1.48.0"
   },
   "devDependencies": {
-    "@effect/platform-node": "4.0.6",
-    "@types/node": "26.6.5",
-    "alchemy": "2.0.0-beta.84",
-    "effect": "4.0.6",
+    "@effect/platform-node": "4.1.2",
+    "@samebase/alchemy-convex": "0.37.0",
+    "@types/node": "26.6.6",
+    "alchemy": "2.0.0-beta.85",
+    "effect": "4.1.2",
     "typescript": "7.0.2",
-    "vite-plus": "1.4.0"
+    "vite": "catalog:",
+    "vite-plus": "catalog:",
+    "vitest": "catalog:"
   },
-  "packageManager": "pnpm@12.15.0"
+  "packageManager": "pnpm@12.16.1"
 }
