@@ -1,7 +1,7 @@
-// Creates IDENTITY_BROKER_KEYS on the selected Convex deployment, once, by hand: the signing key and
-// the pairwise salt of a new hub. It refuses a deployment that has the variable, whatever its value:
-// a wrong value is restored from the backup by hand, never replaced here, and a second run never
-// mints a second salt. Run it once per deployment, never from two places at the same time.
+// Creates IDENTITY_BROKER_KEYS on the selected Convex deployment, once, by hand: the signing key of
+// a new hub. It refuses a deployment that has the variable, whatever its value: a wrong value is
+// replaced by hand, never here, so a second run never replaces a working key. Run it once per
+// deployment, never from two places at the same time.
 //
 //   pnpm run keys:init --prod
 //   pnpm run keys:init --deployment <name>

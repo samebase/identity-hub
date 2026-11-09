@@ -16,4 +16,7 @@ export default defineConfig({
       "typescript/no-deprecated": "error",
     },
   },
+  test: {
+    include: ["convex/**/*.test.ts"],
+  },
 });

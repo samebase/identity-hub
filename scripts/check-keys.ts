@@ -3,10 +3,9 @@
 // must exist (read from `env list`, which lists an empty variable too) and hold a key set the
 // broker's parser accepts; otherwise the deploy stops here instead of at the first sign-in.
 //
-// Creation is separate, because a new key set means a new pairwise salt, which changes every
-// subject the hub ever issued: an established hub that lost the variable restores its backup by
-// hand, never gets a new set from a deploy. No deploy creates keys; `pnpm run keys:init`,
-// scripts/init-keys.ts, does it once by hand.
+// Creation is separate, because a new key set stops every token signed with the old one: an
+// established hub that lost the variable gets a new set by hand, never from a deploy. No deploy
+// creates keys; `pnpm run keys:init`, scripts/init-keys.ts, does it once by hand.
 /// <reference types="node" />
 import { assertKeySetUsable, parseKeySet } from "@samebase/identity-broker";
 import process from "node:process";

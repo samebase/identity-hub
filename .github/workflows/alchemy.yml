@@ -1,28 +1,47 @@
-# Deploys with Alchemy (alchemy.run.ts): a push to main deploys the stage `prod` of the stack
-# `samebase/team-base`, the production deployment of the Convex project `samebase`, and nothing else;
-# the hub has no previews. The state is in that same deployment. The run needs the team token
-# CONVEX_ACCESS_TOKEN, with which it mints the deploy key itself, plus the Google and GitHub
-# clients, which the stack hands to the deployment. Only the Alchemy step gets the secrets.
+# Deploys the hub with Alchemy (alchemy.run.ts): a push to main, or Run workflow on main after a
+# secret or variable changed, deploys the stage `prod`, the production deployment, and nothing
+# else. The state is in the `alchemy-state-store` project of the Convex team, under the stack name
+# GITHUB_REPOSITORY. The run needs the team token CONVEX_ACCESS_TOKEN, with which it mints the
+# deploy key itself. Only the Alchemy step gets the secrets.
 name: alchemy
 on:
   push: { branches: [main] }
+  workflow_dispatch:
 permissions: { contents: read }
-# One deploy at a time: the state store has no lock. A newer push waits, so the last deploy is the
+# One run at a time: the state store has no lock. A newer push waits, so the last deploy is the
 # newest commit.
 concurrency: { group: alchemy-prod, queue: max, cancel-in-progress: false }
 jobs:
   alchemy:
+    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
+      # A repository without the token, such as one just created from this template, deploys
+      # nothing and says so before anything is installed. The token names its Convex team.
+      - name: Skip without the Convex token
+        id: keys
+        env:
+          TOKEN: ${{ secrets.CONVEX_ACCESS_TOKEN }}
+        run: |
+          if [ -z "$TOKEN" ]; then
+            echo "::notice::No deploy: set the repository secret CONVEX_ACCESS_TOKEN (README, Start)."
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+          fi
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        if: steps.keys.outputs.skip != 'true'
         with: { persist-credentials: false }
       - uses: pnpm/action-setup@0977fd99725f1db4007ccb2928dbb4e90d06cc86 # v6
+        if: steps.keys.outputs.skip != 'true'
+        with: { version: 12.16.1 }
       - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
-        with: { node-version-file: .node-version, cache: pnpm }
+        if: steps.keys.outputs.skip != 'true'
+        with: { node-version: 26, cache: pnpm }
       - run: pnpm install --frozen-lockfile
+        if: steps.keys.outputs.skip != 'true'
       # A re-run of an old run must not put older code over newer code.
       - name: Check that the checkout is the head of main
+        if: steps.keys.outputs.skip != 'true'
         env: { TOKEN: "${{ github.token }}" }
         run: |
           auth=$(printf 'x-access-token:%s' "$TOKEN" | base64 | tr -d '\n')
@@ -31,22 +50,19 @@ jobs:
             echo "::error::The checkout is not the head of main ($head). Nothing was deployed."
             exit 1
           fi
-      # A repository without the token, such as a copy of this one, deploys nothing and says so.
-      - name: Skip without the Convex token
-        id: keys
-        env:
-          TOKEN: ${{ secrets.CONVEX_ACCESS_TOKEN }}
-        run: |
-          if [ -z "$TOKEN" ]; then
-            echo "::notice::No deploy: set CONVEX_ACCESS_TOKEN as a repository secret (README, Deploy)."
-            echo "skip=true" >> "$GITHUB_OUTPUT"
-          fi
       - name: Deploy production
         if: steps.keys.outputs.skip != 'true'
         run: pnpm exec alchemy deploy --stage prod --yes --no-input
         env:
           CONVEX_ACCESS_TOKEN: ${{ secrets.CONVEX_ACCESS_TOKEN }}
+          HUB_OWNERS: ${{ vars.HUB_OWNERS }}
+          HUB_PROJECT: ${{ vars.HUB_PROJECT }}
+          HUB_NAME: ${{ vars.HUB_NAME }}
+          HUB_TERMS_URL: ${{ vars.HUB_TERMS_URL }}
+          HUB_PRIVACY_URL: ${{ vars.HUB_PRIVACY_URL }}
+          ISSUER: ${{ vars.ISSUER }}
           GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
           GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
           AUTH_GITHUB_CLIENT_ID: ${{ secrets.AUTH_GITHUB_CLIENT_ID }}
           AUTH_GITHUB_CLIENT_SECRET: ${{ secrets.AUTH_GITHUB_CLIENT_SECRET }}
+          IDENTITY_HUB_MODERATION_KEY: ${{ secrets.IDENTITY_HUB_MODERATION_KEY }}
