@@ -37,6 +37,9 @@ minutes.
 
    A GitHub account's numeric id is at `https://api.github.com/users/<login>`, field `id`.
 
+   Variables appear in plain text in the workflow's run logs, which are public in a public
+   repository; secrets appear as `***`. Put anything private in a secret.
+
 3. **Run the workflow once.** Actions, alchemy, Run workflow, on `main`. The run creates the Convex
    project and an empty production deployment, and prints its `url` and `deployment` name. It pushes
    no code yet. The stack never takes over a project that exists already: if the name is taken, the
