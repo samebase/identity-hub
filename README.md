@@ -73,9 +73,16 @@ hand: saving a secret does not start a run.
 ## Custom domain
 
 Custom domains need a Convex plan that includes them. Add the domain in the Convex dashboard (the
-deployment, Settings, Custom Domains), point its DNS at Convex as the dashboard says, and wait until
-it serves HTTPS. Then set the variable `ISSUER` to `https://<domain>`, register the callbacks for
-that domain at Google and GitHub, and run the workflow.
+deployment, Settings, Custom Domains), then create both DNS records it asks for:
+
+| Type  | Name                       | Value                                     |
+| ----- | -------------------------- | ----------------------------------------- |
+| CNAME | `<domain>`                 | `convex.domains` (DNS only, no proxy)     |
+| TXT   | `_convex_domains.<domain>` | the `deployment` name that step 3 printed |
+
+Convex verifies the domain only with the TXT record. Wait until `https://<domain>` serves HTTPS.
+Then set the variable `ISSUER` to `https://<domain>`, register the callbacks for that domain at
+Google and GitHub, and run the workflow.
 
 Do it before the first app registers. Changing the issuer later is a move: every app registers again
 and needs the new callbacks.
