@@ -1,7 +1,7 @@
 {
   "name": "identity-hub",
   "private": true,
-  "license": "Apache-2.0",
+  "license": "MIT",
   "type": "module",
   "scripts": {
     "deploy": "node ./scripts/check-keys.ts && convex deploy --yes",

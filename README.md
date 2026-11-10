@@ -6,7 +6,7 @@ gets a standard OpenID Connect `id_token` and owns its users.
 
 [![Convex component](https://img.shields.io/badge/Convex_component-identity--broker-8D2676)](https://www.convex.dev/components/samebase/identity-broker)
 [![npm](https://img.shields.io/npm/v/@samebase/identity-broker?label=%40samebase%2Fidentity-broker)](https://www.npmjs.com/package/@samebase/identity-broker)
-[![License](https://img.shields.io/badge/license-Apache--2.0-blue)](./LICENSE)
+[![License](https://img.shields.io/badge/license-MIT-blue)](./LICENSE)
 
 ![Google and GitHub refuse preview deployments because each has a new URL. The hub sits in front of them, so each provider sees one client and one URL, and every app and preview registers its exact URL at deploy.](https://raw.githubusercontent.com/samebase/samebase/main/packages/identity-broker/docs/how-it-works.gif)
 
@@ -160,4 +160,4 @@ before you merge: a release that changes stored data says what to do.
 
 ## License
 
-[Apache-2.0](./LICENSE).
+[MIT](./LICENSE). Copy it, change it, ship it; keep the copyright line.
