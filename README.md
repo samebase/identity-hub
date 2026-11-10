@@ -1,79 +1,117 @@
 # identity-hub
 
-A sign-in hub on [Convex](https://convex.dev): one place that holds a Google OAuth client and a
-GitHub OAuth App, and signs users in to every app that registers with it. It keeps no user accounts.
-Each app gets an OpenID Connect `id_token` and creates its own user from it. The hub is
-[`@samebase/identity-broker`](https://www.npmjs.com/package/@samebase/identity-broker) plus the
-settings of this repository.
+Your own sign-in service on [Convex](https://convex.dev). One Google client and one GitHub OAuth
+App, for every app, preview, and dev checkout you deploy. The hub keeps no user accounts: each app
+gets a standard OpenID Connect `id_token` and owns its users.
 
-Samebase runs this repository, unchanged, as its public hub. Apps made with
-[Samebase](https://samebase.com) sign in there. Use this template to run your own.
+[![Convex component](https://img.shields.io/badge/Convex_component-identity--broker-8D2676)](https://www.convex.dev/components/samebase/identity-broker)
+[![npm](https://img.shields.io/npm/v/@samebase/identity-broker?label=%40samebase%2Fidentity-broker)](https://www.npmjs.com/package/@samebase/identity-broker)
+[![License](https://img.shields.io/badge/license-Apache--2.0-blue)](./LICENSE)
 
-## How it works
+![Google and GitHub refuse preview deployments because each has a new URL. The hub sits in front of them, so each provider sees one client and one URL, and every app and preview registers its exact URL at deploy.](https://raw.githubusercontent.com/samebase/samebase/main/packages/identity-broker/docs/how-it-works.gif)
 
-- An app registers in its own GitHub Actions run, with GitHub's OIDC token as proof of its
-  repository. No account at the hub is needed. `HUB_OWNERS` decides which repositories may register.
-- Each deployment of the app (production, a preview, a development checkout) gets its own client.
-- A user's `sub` is the provider's own id, `google:<id>` or `github:<id>`. It is the same at every
-  hub, so an app can move to another hub and keep its users.
+Samebase runs this repository, unchanged, as its public hub at `id.samebase.com`. Every app made
+from [samebase/base](https://github.com/samebase/base) signs in there out of the box. Use this
+template when you want the same thing under your own name, with your own Google project and your own
+rules about who may register.
+
+## Why a hub
+
+- **Providers want one callback URL.** Google and GitHub need each redirect URI registered by hand,
+  so a preview deployment with a fresh URL cannot have Google sign-in. The hub registers that URL
+  itself, at deploy time.
+- **No account, no token.** An app registers in its own GitHub Actions run, with GitHub's OIDC token
+  as proof of its repository. `HUB_OWNERS` decides which GitHub accounts may register.
+- **Users are portable.** A user's `sub` is the provider's own id, `google:<id>` or `github:<id>`,
+  the same at every hub. An app can move to another hub and keep its users.
+
+The hub is [`@samebase/identity-broker`](https://www.npmjs.com/package/@samebase/identity-broker)
+plus the settings of this repository.
 
 ## Start
 
-You need a Convex team, a Google Cloud project, and a GitHub account. The steps take about 15
-minutes.
+You need a Convex team, a Google Cloud project, and a GitHub account. About 15 minutes.
 
-1. **Create the repository** with "Use this template".
-2. **Set the settings** in the repository, Settings, Secrets and variables, Actions:
+### 1. Create the repository
 
-   | Name                          | Kind     | Value                                                                                                  |
-   | ----------------------------- | -------- | ------------------------------------------------------------------------------------------------------ |
-   | `CONVEX_ACCESS_TOKEN`         | secret   | A Convex team access token (Convex dashboard, team settings, Access Tokens).                           |
-   | `HUB_OWNERS`                  | variable | `any`, or the numeric ids of the GitHub accounts whose repositories may register, separated by commas. |
-   | `HUB_NAME`                    | variable | The name of your sign-in service, shown on the sign-in page.                                           |
-   | `HUB_TERMS_URL`               | variable | Your terms for the sign-in service.                                                                    |
-   | `HUB_PRIVACY_URL`             | variable | Your privacy notice for the sign-in service.                                                           |
-   | `HUB_PROJECT`                 | variable | Optional. The Convex project name. Default: the repository name.                                       |
-   | `IDENTITY_HUB_MODERATION_KEY` | secret   | Optional. A long random key for the `/moderation/*` API.                                               |
+Select **Use this template** on this page.
 
-   A GitHub account's numeric id is at `https://api.github.com/users/<login>`, field `id`.
+### 2. Set the settings
 
-3. **Run the workflow once.** Actions, alchemy, Run workflow, on `main`. The run creates the Convex
-   project and an empty production deployment, and prints its `url` and `deployment` name. It pushes
-   no code yet. The stack never takes over a project that exists already: if the name is taken, the
-   run stops. Set `HUB_PROJECT` to another name and run it again.
-4. **Choose the issuer now.** It is the deployment's `url`, or a custom domain (see Custom domain).
-   Every app and both providers use it, so set it before the next steps.
-5. **Create the two clients**, with the issuer from step 4:
-   - Google Cloud console, Google Auth Platform, Clients: a Web application client with the redirect
-     URI `<issuer>/connectors/google/callback`. Publish the app and add your domain to the branding
-     when you open the hub to other people.
-   - GitHub, Settings, Developer settings, OAuth Apps: a new OAuth App with the callback URL
-     `<issuer>/connectors/github/callback`.
+In the repository, **Settings**, **Secrets and variables**, **Actions**:
 
-   Set them as secrets: `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `AUTH_GITHUB_CLIENT_ID`,
-   `AUTH_GITHUB_CLIENT_SECRET`.
+| Name                          | Kind     | Value                                                                                                  |
+| ----------------------------- | -------- | ------------------------------------------------------------------------------------------------------ |
+| `CONVEX_ACCESS_TOKEN`         | secret   | A Convex team access token (Convex dashboard, team settings, Access Tokens).                           |
+| `HUB_OWNERS`                  | variable | `any`, or the numeric ids of the GitHub accounts whose repositories may register, separated by commas. |
+| `HUB_NAME`                    | variable | The name of your sign-in service, shown on the sign-in page.                                           |
+| `HUB_TERMS_URL`               | variable | Your terms for the sign-in service.                                                                    |
+| `HUB_PRIVACY_URL`             | variable | Your privacy notice for the sign-in service.                                                           |
+| `HUB_PROJECT`                 | variable | Optional. The Convex project name. Default: the repository name.                                       |
+| `IDENTITY_HUB_MODERATION_KEY` | secret   | Optional. A long random key for the `/moderation/*` API.                                               |
 
-6. **Create the signing keys once,** from a clone of the repository:
+A GitHub account's numeric id is the `id` field at `https://api.github.com/users/<login>`.
 
-   ```sh
-   pnpm install
-   npx convex login
-   env -u CONVEX_DEPLOY_KEY pnpm run keys:init --deployment <deployment>
-   ```
+### 3. Run the workflow once
 
-   Use the `deployment` name that step 3 printed. The script refuses a deployment that already has
-   keys. Back up the value it writes (`IDENTITY_BROKER_KEYS`) somewhere safe.
+**Actions**, **alchemy**, **Run workflow**, on `main`. The run creates the Convex project and an
+empty production deployment, and prints its `url` and `deployment` name. It pushes no code yet. If
+the project name is taken, the run stops: set `HUB_PROJECT` to another name and run it again.
 
-7. **Run the workflow again.** This run pushes the hub. Check it:
-   `<issuer>/.well-known/openid-configuration` answers with your issuer.
+### 4. Choose the issuer
+
+The issuer is the deployment's `url`, or a [custom domain](#custom-domain). Every app and both
+providers use it, so decide now.
+
+### 5. Create the two clients
+
+- **Google Cloud console**, Google Auth Platform, Clients: a Web application client with the
+  redirect URI `<issuer>/connectors/google/callback`. Publish the app and add your domain to the
+  branding when you open the hub to other people.
+- **GitHub**, Settings, Developer settings, OAuth Apps: a new OAuth App with the callback URL
+  `<issuer>/connectors/github/callback`.
+
+Save them as the secrets `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `AUTH_GITHUB_CLIENT_ID`, and
+`AUTH_GITHUB_CLIENT_SECRET`.
+
+### 6. Create the signing keys once
+
+From a clone of the repository, with the `deployment` name from step 3:
+
+```sh
+pnpm install
+npx convex login
+env -u CONVEX_DEPLOY_KEY pnpm run keys:init --deployment <deployment>
+```
+
+The script refuses a deployment that already has keys. Back up the value it writes,
+`IDENTITY_BROKER_KEYS`, somewhere safe.
+
+### 7. Run the workflow again
+
+This run pushes the hub. `<issuer>/.well-known/openid-configuration` now answers with your issuer.
 
 Every push to `main` deploys again. After you change a secret or a variable, run the workflow by
 hand: saving a secret does not start a run.
 
+## Connect an app
+
+An app from [samebase/base](https://github.com/samebase/base) names its hub in `alchemy.run.ts`:
+
+```ts
+const HUB = { issuer: "https://<your issuer>", terms: "<your HUB_TERMS_URL>" };
+```
+
+Its next deploy registers its clients here. Any other app uses the `IdentityHub.Client` resource of
+[`@samebase/alchemy-convex`](https://www.npmjs.com/package/@samebase/alchemy-convex), with
+`connectors: ["google", "github"]`. The broker's
+[consumer guide](https://github.com/samebase/samebase/blob/main/packages/identity-broker/docs/consumers.md)
+has the details.
+
 ## Custom domain
 
 Custom domains need a Convex plan that includes them. Add the domain in the Convex dashboard (the
-deployment, Settings, Custom Domains), then create both DNS records it asks for:
+deployment, **Settings**, **Custom Domains**), then create both DNS records it asks for:
 
 | Type  | Name                       | Value                                     |
 | ----- | -------------------------- | ----------------------------------------- |
@@ -86,21 +124,6 @@ Google and GitHub, and run the workflow.
 
 Do it before the first app registers. Changing the issuer later is a move: every app registers again
 and needs the new callbacks.
-
-## Connect an app
-
-An app made with Samebase's starter, [samebase/base](https://github.com/samebase/base), names its
-hub in `alchemy.run.ts`:
-
-```ts
-const HUB = { issuer: "https://<your issuer>", terms: "<your HUB_TERMS_URL>" };
-```
-
-Its next deploy registers its clients here. Any other app uses the `IdentityHub.Client` resource of
-[`@samebase/alchemy-convex`](https://www.npmjs.com/package/@samebase/alchemy-convex), with
-`connectors: ["google", "github"]`. The broker's
-[consumer guide](https://github.com/samebase/samebase/blob/main/packages/identity-broker/docs/consumers.md)
-has the details.
 
 ## Operate
 
@@ -137,4 +160,4 @@ before you merge: a release that changes stored data says what to do.
 
 ## License
 
-Apache-2.0.
+[Apache-2.0](./LICENSE).
