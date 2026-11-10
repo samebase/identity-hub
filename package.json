@@ -13,7 +13,7 @@
     "test": "vp test"
   },
   "dependencies": {
-    "@samebase/identity-broker": "0.31.0",
+    "@samebase/identity-broker": "0.32.0",
     "convex": "1.48.0"
   },
   "devDependencies": {

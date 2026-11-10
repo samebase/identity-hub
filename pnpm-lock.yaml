@@ -202,8 +202,8 @@ importers:
   .:
     dependencies:
       '@samebase/identity-broker':
-        specifier: 0.31.0
-        version: 0.31.0(convex@1.48.0)(typescript@7.0.2)
+        specifier: 0.32.0
+        version: 0.32.0(convex@1.48.0)(typescript@7.0.2)
       convex:
         specifier: 1.48.0
         version: 1.48.0
@@ -900,8 +900,8 @@ packages:
       convex: ^1.48.0
       effect: ^4.1.0
 
-  '@samebase/identity-broker@0.31.0':
-    resolution: {integrity: sha512-73jR+KkFa4n263Q4oicqJ8HsCFt+vN0lgKz0Byn2HnzrMoVkS/dWDPgG2PEzzs+EskhtsJy4snkw9DTMGlwUQg==}
+  '@samebase/identity-broker@0.32.0':
+    resolution: {integrity: sha512-bX1fR7Ue2DWJmpIPkJAPepBUDqimQ0EL5t08cOfGVBVnK2JObVQEKItK4bUiyjVuwiwNoGhbeCJnvm/fAaMPVA==}
     engines: {node: '>=24.11.0'}
     hasBin: true
     peerDependencies:
@@ -2122,7 +2122,7 @@ snapshots:
       convex: 1.48.0
       effect: 4.1.2
 
-  '@samebase/identity-broker@0.31.0(convex@1.48.0)(typescript@7.0.2)':
+  '@samebase/identity-broker@0.32.0(convex@1.48.0)(typescript@7.0.2)':
     dependencies:
       '@convex-dev/rate-limiter': 0.4.2(convex@1.48.0)(typescript@7.0.2)
       convex: 1.48.0
