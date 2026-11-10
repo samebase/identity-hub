@@ -1,19 +1,39 @@
 # identity-hub
 
-Your own sign-in service on [Convex](https://convex.dev). One Google client and one GitHub OAuth
-App, for every app, preview, and dev checkout you deploy. The hub keeps no user accounts: each app
-gets a standard OpenID Connect `id_token` and owns its users.
+Google and GitHub sign-in for every deployment of your app: production, each pull request preview,
+each dev checkout. One Google client serves them all. The hub keeps no user accounts: each app gets
+a standard OpenID Connect `id_token` and owns its users.
 
-[![Convex component](https://img.shields.io/badge/Convex_component-identity--broker-8D2676)](https://www.convex.dev/components/samebase/identity-broker)
+[![Convex Component](https://www.convex.dev/components/badge/samebase/identity-broker)](https://www.convex.dev/components/samebase/identity-broker)
 [![npm](https://img.shields.io/npm/v/@samebase/identity-broker?label=%40samebase%2Fidentity-broker)](https://www.npmjs.com/package/@samebase/identity-broker)
 [![License](https://img.shields.io/badge/license-MIT-blue)](./LICENSE)
 
 ![Google and GitHub refuse preview deployments because each has a new URL. The hub sits in front of them, so each provider sees one client and one URL, and every app and preview registers its exact URL at deploy.](https://raw.githubusercontent.com/samebase/samebase/main/packages/identity-broker/docs/how-it-works.gif)
 
-Samebase runs this repository, unchanged, as its public hub at `id.samebase.com`. Every app made
-from [samebase/base](https://github.com/samebase/base) signs in there out of the box. Use this
-template when you want the same thing under your own name, with your own Google project and your own
-rules about who may register.
+## Which one are you?
+
+**You want sign-in in your app.** You do not need to run a hub. Samebase runs this repository,
+unchanged, as a public hub at `id.samebase.com`, and an app registers there from its own GitHub
+Actions run, with no account. Start from [samebase/base](https://github.com/samebase/base), where it
+works on the first deploy. In its Alchemy stack it is one resource:
+
+```ts
+IdentityHub.Client("IdentityHubClient", {
+  hub: { issuer: "https://id.samebase.com" },
+  connectors: ["google", "github"],
+  redirectUris: [Output.interpolate`${deployment.siteUrl}/auth/hub/callback`],
+  deploymentType: stage === "prod" ? "production" : "preview",
+});
+```
+
+For an app that does not come from the starter, the broker's
+[consumer guide](https://github.com/samebase/samebase/blob/main/packages/identity-broker/docs/consumers.md)
+has the steps. The public hub is a shared service under
+[Samebase's terms](https://samebase.com/terms).
+
+**You want your own hub.** Your name on the sign-in page, your Google project, and your rules about
+who may register. This repository is the template: [run your own hub](#run-your-own-hub), in about
+15 minutes.
 
 ## Why a hub
 
@@ -28,7 +48,7 @@ rules about who may register.
 The hub is [`@samebase/identity-broker`](https://www.npmjs.com/package/@samebase/identity-broker)
 plus the settings of this repository.
 
-## Start
+## Run your own hub
 
 You need a Convex team, a Google Cloud project, and a GitHub account. About 15 minutes.
 
@@ -94,7 +114,7 @@ This run pushes the hub. `<issuer>/.well-known/openid-configuration` now answers
 Every push to `main` deploys again. After you change a secret or a variable, run the workflow by
 hand: saving a secret does not start a run.
 
-## Connect an app
+## Connect an app to your hub
 
 An app from [samebase/base](https://github.com/samebase/base) names its hub in `alchemy.run.ts`:
 
@@ -157,6 +177,22 @@ and needs the new callbacks.
 Renovate opens a pull request when a new broker or alchemy-convex version is out. Read the
 [broker's changelog](https://github.com/samebase/samebase/blob/main/packages/identity-broker/CHANGELOG.md)
 before you merge: a release that changes stored data says what to do.
+
+## What the hub holds
+
+- **No user accounts, no sessions, no passwords.** Every sign-in goes to Google or GitHub again, and
+  the app makes its own user from the `id_token`.
+- **What it does store:** the apps, their clients, and short-lived sign-in records. A daily cron
+  removes the expired ones.
+- **Standards:** OAuth 2.0 with PKCE and exact redirect URIs, OpenID Connect Core and Discovery, RFC
+  8414, RFC 9207, and RFC 9700. The broker's
+  [standards list](https://github.com/samebase/samebase/blob/main/packages/identity-broker/docs/standards.md)
+  has each one with its sections, and its
+  [design notes](https://github.com/samebase/samebase/blob/main/packages/identity-broker/docs/design.md)
+  name the departures.
+- **In production:** `id.samebase.com` runs this repository unchanged.
+
+Report a vulnerability in private: see [SECURITY.md](./SECURITY.md).
 
 ## License
 
