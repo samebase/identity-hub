@@ -12,8 +12,8 @@ gets a standard OpenID Connect `id_token` and owns its users.
 
 Samebase runs this repository, unchanged, as its public hub at `id.samebase.com`. Every app made
 from [samebase/base](https://github.com/samebase/base) signs in there out of the box. Use this
-template when you want the same thing under your own name, with your own Google project and your
-own rules about who may register.
+template when you want the same thing under your own name, with your own Google project and your own
+rules about who may register.
 
 ## Why a hub
 
@@ -65,9 +65,9 @@ providers use it, so decide now.
 
 ### 5. Create the two clients
 
-- **Google Cloud console**, Google Auth Platform, Clients: a Web application client with the redirect
-  URI `<issuer>/connectors/google/callback`. Publish the app and add your domain to the branding
-  when you open the hub to other people.
+- **Google Cloud console**, Google Auth Platform, Clients: a Web application client with the
+  redirect URI `<issuer>/connectors/google/callback`. Publish the app and add your domain to the
+  branding when you open the hub to other people.
 - **GitHub**, Settings, Developer settings, OAuth Apps: a new OAuth App with the callback URL
   `<issuer>/connectors/github/callback`.
 
