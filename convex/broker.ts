@@ -37,7 +37,7 @@ export const broker = defineIdentityBroker({
       selectAccount: true,
     }),
   ],
-  // `POST /hub-clients` creates every client; `/moderation/*` answers the holder of the moderation
+  // `POST /register` creates every client; `/moderation/*` answers the holder of the moderation
   // key.
   registration: {
     name: env.HUB_NAME,

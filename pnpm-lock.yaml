@@ -202,8 +202,8 @@ importers:
   .:
     dependencies:
       '@samebase/identity-broker':
-        specifier: 0.31.0
-        version: 0.31.0(convex@1.48.0)(typescript@7.0.2)
+        specifier: 0.33.0
+        version: 0.33.0(convex@1.48.0)(typescript@7.0.2)
       convex:
         specifier: 1.48.0
         version: 1.48.0
@@ -212,8 +212,8 @@ importers:
         specifier: 4.1.2
         version: 4.1.2(effect@4.1.2)(redis@6.3.1)
       '@samebase/alchemy-convex':
-        specifier: 0.39.1
-        version: 0.39.1(@effect/platform-node@4.1.2(effect@4.1.2)(redis@6.3.1))(alchemy@2.0.0-beta.85(@effect/platform-node@4.1.2(effect@4.1.2)(redis@6.3.1))(@voidzero-dev/vite-plus-core@1.4.0(@types/node@26.6.6)(esbuild@0.27.0)(typescript@7.0.2)(yaml@2.9.1))(effect@4.1.2)(ws@8.22.1))(convex@1.48.0)(effect@4.1.2)
+        specifier: 0.40.0
+        version: 0.40.0(@effect/platform-node@4.1.2(effect@4.1.2)(redis@6.3.1))(alchemy@2.0.0-beta.85(@effect/platform-node@4.1.2(effect@4.1.2)(redis@6.3.1))(@voidzero-dev/vite-plus-core@1.4.0(@types/node@26.6.6)(esbuild@0.27.0)(typescript@7.0.2)(yaml@2.9.1))(effect@4.1.2)(ws@8.22.1))(convex@1.48.0)(effect@4.1.2)
       '@types/node':
         specifier: 26.6.6
         version: 26.6.6
@@ -890,8 +890,8 @@ packages:
   '@rolldown/pluginutils@1.0.1':
     resolution: {integrity: sha512-2j9bGt5Jh8hj+vPtgzPtl72j0yRxHAyumoo6TNfAjsLB04UtpSvPbPcDcBMxz7n+9CYB0c1GxQFxYRg2jimqGw==}
 
-  '@samebase/alchemy-convex@0.39.1':
-    resolution: {integrity: sha512-KpCa1mMjO7I/K9kKvJS3Ftg3fPMn9XGU1NFU0mUdCfB+UojD0WpHL1/lSQC7zUYE8oO5TCYAcHyKTvzLr+91hg==}
+  '@samebase/alchemy-convex@0.40.0':
+    resolution: {integrity: sha512-pNqA0ePSFi88DM6BiG2bAdwgzpdowOL4XN6VqbnH8UTdd1HP/JuLCY+uKFn0IGBynUAqADfc/bVXdWmADFZ3vw==}
     engines: {node: '>=22'}
     hasBin: true
     peerDependencies:
@@ -900,8 +900,8 @@ packages:
       convex: ^1.48.0
       effect: ^4.1.0
 
-  '@samebase/identity-broker@0.31.0':
-    resolution: {integrity: sha512-73jR+KkFa4n263Q4oicqJ8HsCFt+vN0lgKz0Byn2HnzrMoVkS/dWDPgG2PEzzs+EskhtsJy4snkw9DTMGlwUQg==}
+  '@samebase/identity-broker@0.33.0':
+    resolution: {integrity: sha512-CaETzS8E9pwmFJBYOSvM0e5iUh8gohAdGS6zWQhBehauvH9gQEApcaXeHUtqAshW2nV9IL+kNVZ+aeVM1bNnmQ==}
     engines: {node: '>=24.11.0'}
     hasBin: true
     peerDependencies:
@@ -2114,7 +2114,7 @@ snapshots:
 
   '@rolldown/pluginutils@1.0.1': {}
 
-  '@samebase/alchemy-convex@0.39.1(@effect/platform-node@4.1.2(effect@4.1.2)(redis@6.3.1))(alchemy@2.0.0-beta.85(@effect/platform-node@4.1.2(effect@4.1.2)(redis@6.3.1))(@voidzero-dev/vite-plus-core@1.4.0(@types/node@26.6.6)(esbuild@0.27.0)(typescript@7.0.2)(yaml@2.9.1))(effect@4.1.2)(ws@8.22.1))(convex@1.48.0)(effect@4.1.2)':
+  '@samebase/alchemy-convex@0.40.0(@effect/platform-node@4.1.2(effect@4.1.2)(redis@6.3.1))(alchemy@2.0.0-beta.85(@effect/platform-node@4.1.2(effect@4.1.2)(redis@6.3.1))(@voidzero-dev/vite-plus-core@1.4.0(@types/node@26.6.6)(esbuild@0.27.0)(typescript@7.0.2)(yaml@2.9.1))(effect@4.1.2)(ws@8.22.1))(convex@1.48.0)(effect@4.1.2)':
     dependencies:
       '@convex-dev/platform': 0.1.11
       '@effect/platform-node': 4.1.2(effect@4.1.2)(redis@6.3.1)
@@ -2122,7 +2122,7 @@ snapshots:
       convex: 1.48.0
       effect: 4.1.2
 
-  '@samebase/identity-broker@0.31.0(convex@1.48.0)(typescript@7.0.2)':
+  '@samebase/identity-broker@0.33.0(convex@1.48.0)(typescript@7.0.2)':
     dependencies:
       '@convex-dev/rate-limiter': 0.4.2(convex@1.48.0)(typescript@7.0.2)
       convex: 1.48.0
