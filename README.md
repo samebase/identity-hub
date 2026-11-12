@@ -32,8 +32,7 @@ has the steps. The public hub is a shared service under
 [Samebase's terms](https://samebase.com/terms).
 
 **You want your own hub.** Your name on the sign-in page, your Google project, and your rules about
-who may register. This repository is the template: [run your own hub](#run-your-own-hub), in about
-15 minutes.
+who may register. This repository is the template: [run your own hub](#run-your-own-hub).
 
 ## Why a hub
 
@@ -50,7 +49,7 @@ plus the settings of this repository.
 
 ## Run your own hub
 
-You need a Convex team, a Google Cloud project, and a GitHub account. About 15 minutes.
+You need a Convex team, a Google Cloud project, and a GitHub account.
 
 ### 1. Create the repository
 
