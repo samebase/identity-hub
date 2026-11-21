@@ -148,9 +148,10 @@ and needs the new callbacks.
 
 - **Pause every app:** set `APPS_PAUSED=true` on the deployment (Convex dashboard, Environment
   Variables). Remove it to resume.
-- **List and delete:** `npx convex run --deployment <deployment> broker:listApps`, then
-  `broker:listClients '{"appId":"..."}'`, `broker:deleteClient '{"clientId":"..."}'`,
-  `broker:deleteApp '{"appId":"..."}'`.
+- **List and delete clients:** `GET <issuer>/moderation/clients` lists the newest clients, or with
+  `?owner=<numeric id>` those of one GitHub account;
+  `DELETE <issuer>/moderation/clients/<client id>` deletes one. Both take the moderation key, as
+  below.
 - **Block a repository or an owner** at once, whatever `HUB_OWNERS` says:
 
   ```sh
@@ -161,7 +162,7 @@ and needs the new callbacks.
 
   `"kind":"owner"` blocks every repository of an account, and `"action":"unblock"` lifts a block.
   The other endpoints are in the broker's
-  [moderation API](https://github.com/samebase/samebase/blob/main/packages/identity-broker/src/client/moderation.ts).
+  [moderation API](https://github.com/samebase/samebase/blob/main/packages/identity-broker/README.md#moderation).
 
 - A daily cron removes expired requests, old sign-in records, and preview and development clients
   that no deploy renewed for 14 days. A production client stays until you delete it.

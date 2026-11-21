@@ -4,7 +4,7 @@
   "license": "MIT",
   "type": "module",
   "scripts": {
-    "deploy": "node ./scripts/check-keys.ts && convex deploy --yes",
+    "deploy": "convex deploy --yes",
     "keys:init": "node ./scripts/init-keys.ts",
     "check": "vp check && pnpm run typecheck && vp test",
     "typecheck": "tsc --project convex/tsconfig.json && tsc --project tsconfig.node.json",
@@ -13,15 +13,15 @@
     "test": "vp test"
   },
   "dependencies": {
-    "@samebase/identity-broker": "0.34.0",
-    "convex": "1.48.0"
+    "@samebase/identity-broker": "0.37.0",
+    "convex": "1.48.0",
+    "effect": "4.1.4"
   },
   "devDependencies": {
     "@effect/platform-node": "4.1.4",
     "@samebase/alchemy-convex": "0.44.0",
     "@types/node": "26.6.6",
     "alchemy": "2.0.0-beta.87",
-    "effect": "4.1.4",
     "typescript": "7.0.2",
     "vite": "catalog:",
     "vite-plus": "catalog:",

@@ -1,9 +1,11 @@
 /**
  * Who may register at this hub, from HUB_OWNERS: `any`, or the numeric ids of the GitHub accounts
  * (users or organizations) whose repositories may register, separated by commas. Anything else
- * throws, so a typo stops the deploy instead of opening or closing the hub.
+ * throws, so a typo stops the deploy instead of opening or closing the hub. The owner is the one
+ * GitHub's token of the registering run proves: the account that owns the repository, never the
+ * person or bot that ran the workflow.
  */
-export function parseOwners(value: string): "any" | readonly string[] {
+export function parseOwners(value: string): "any" | Array<{ ownerId: string }> {
   const trimmed = value.trim();
   if (trimmed === "any") {
     return "any";
@@ -14,14 +16,5 @@ export function parseOwners(value: string): "any" | readonly string[] {
       `HUB_OWNERS is "any" or numeric GitHub owner ids separated by commas, not "${value}".`,
     );
   }
-  return ids;
-}
-
-/**
- * Whether a repository of this owner may register. The owner is the one GitHub's token of the
- * registering run proves: the account that owns the repository, never the person or bot that ran
- * the workflow.
- */
-export function mayRegister(owners: "any" | readonly string[], ownerId: string): boolean {
-  return owners === "any" || owners.includes(ownerId);
+  return ids.map((ownerId) => ({ ownerId }));
 }

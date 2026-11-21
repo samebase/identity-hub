@@ -1,4 +1,4 @@
-// Runs the installed Convex CLI for the key scripts. The selection after the script name names the
+// Runs the installed Convex CLI for scripts/init-keys.ts. The selection after the script name names the
 // deployment: `--prod`, `--deployment <name>`, or nothing for the deployment of CONVEX_DEPLOY_KEY
 // or of this checkout.
 /// <reference types="node" />

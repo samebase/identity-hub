@@ -98,8 +98,8 @@ export default Alchemy.Stack(
     const deployment = yield* Convex.Deployment("Deployment", {
       project,
       type: "prod",
-      // The push is the `deploy` package script, which checks the key set first. The functions,
-      // package.json, and the lockfile are always hashed.
+      // The push is the `deploy` package script. The functions, package.json, and the lockfile
+      // are always hashed.
       source: {
         path: "./convex",
         command: ["node", "--run", "deploy"],
