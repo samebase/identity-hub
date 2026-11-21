@@ -12,7 +12,7 @@ import { parseOwners } from "./owners";
 // `convex.config.ts` declares the variables. The signing keys are IDENTITY_BROKER_KEYS.
 
 export const hub = convexHub(
-  components.identityBroker,
+  components.identityHub,
   hubSettings({
     // The deployment's own convex.site URL until ISSUER names a custom domain. Every app names the
     // issuer, so ISSUER is set before the first app registers (README, Custom domain).

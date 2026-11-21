@@ -176,7 +176,9 @@ and needs the new callbacks.
 
 Renovate opens a pull request when a new broker or alchemy-convex version is out. Read the
 [broker's changelog](https://github.com/samebase/samebase/blob/main/packages/identity-broker/CHANGELOG.md)
-before you merge: a release that changes stored data says what to do.
+before you merge: a release that changes stored data says what to do. After the first push of
+0.37.0, the old component `identityBroker` is unmounted; its rows stay in the deployment, and the
+Convex dashboard can delete them.
 
 ## What the hub holds
 

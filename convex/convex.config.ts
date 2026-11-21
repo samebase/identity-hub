@@ -37,6 +37,7 @@ const app = defineApp({
   },
 });
 
-app.use(identityBroker);
+// Not the default name: a deployment that ran 0.34.0 or earlier keeps its rows under `identityBroker`, which do not fit this schema.
+app.use(identityBroker, { name: "identityHub" });
 
 export default app;
