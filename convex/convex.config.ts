@@ -3,8 +3,8 @@ import { defineApp } from "convex/server";
 import { v } from "convex/values";
 
 // A push fails while a required variable is missing. The stack (alchemy.run.ts) sets every
-// variable here but IDENTITY_BROKER_KEYS, which scripts/init-keys.ts creates once by hand and
-// scripts/check-keys.ts checks before each push, and APPS_PAUSED, which is set by hand.
+// variable here but IDENTITY_BROKER_KEYS, which scripts/init-keys.ts creates once by hand, and
+// APPS_PAUSED, which is set by hand.
 const app = defineApp({
   env: {
     /** The signing key set. */
@@ -37,6 +37,7 @@ const app = defineApp({
   },
 });
 
-app.use(identityBroker);
+// Not the default name: a deployment that ran 0.34.0 or earlier keeps its rows under `identityBroker`, which do not fit this schema.
+app.use(identityBroker, { name: "identityHub" });
 
 export default app;

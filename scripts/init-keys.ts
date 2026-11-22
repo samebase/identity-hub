@@ -6,9 +6,28 @@
 //   pnpm run keys:init --prod
 //   pnpm run keys:init --deployment <name>
 /// <reference types="node" />
-import { createKeySet } from "@samebase/identity-broker";
 import process from "node:process";
 import { hasVariable, runConvex } from "./convex-cli.ts";
+
+/** A key set with one current RS256 key, in the format of the broker's README (Environment variables). */
+async function createKeySet() {
+  const { privateKey } = await crypto.subtle.generateKey(
+    {
+      name: "RSASSA-PKCS1-v1_5",
+      modulusLength: 2048,
+      publicExponent: new Uint8Array([1, 0, 1]),
+      hash: "SHA-256",
+    },
+    true,
+    ["sign", "verify"],
+  );
+  const jwk = await crypto.subtle.exportKey("jwk", privateKey);
+  const kid = crypto.randomUUID();
+  return {
+    version: 1,
+    keys: [{ kid, status: "current", privateJwk: { ...jwk, kid, use: "sig" } }],
+  };
+}
 
 async function main(selection: string[]) {
   if (await hasVariable("IDENTITY_BROKER_KEYS", selection)) {

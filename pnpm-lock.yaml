@@ -202,11 +202,14 @@ importers:
   .:
     dependencies:
       '@samebase/identity-broker':
-        specifier: 0.34.0
-        version: 0.34.0(convex@1.48.0)(typescript@7.0.2)
+        specifier: 0.37.0
+        version: 0.37.0(alchemy@2.0.0-beta.87(@effect/platform-node@4.1.4(effect@4.1.4)(redis@6.3.1))(@voidzero-dev/vite-plus-core@1.4.0(@types/node@26.6.6)(esbuild@0.27.0)(typescript@7.0.2)(yaml@2.9.1))(effect@4.1.4)(ws@8.22.1))(convex@1.48.0)(effect@4.1.4)
       convex:
         specifier: 1.48.0
         version: 1.48.0
+      effect:
+        specifier: 4.1.4
+        version: 4.1.4
     devDependencies:
       '@effect/platform-node':
         specifier: 4.1.4
@@ -220,9 +223,6 @@ importers:
       alchemy:
         specifier: 2.0.0-beta.87
         version: 2.0.0-beta.87(@effect/platform-node@4.1.4(effect@4.1.4)(redis@6.3.1))(@voidzero-dev/vite-plus-core@1.4.0(@types/node@26.6.6)(esbuild@0.27.0)(typescript@7.0.2)(yaml@2.9.1))(effect@4.1.4)(ws@8.22.1)
-      effect:
-        specifier: 4.1.4
-        version: 4.1.4
       typescript:
         specifier: 7.0.2
         version: 7.0.2
@@ -268,22 +268,8 @@ packages:
   '@blazediff/core@1.10.0':
     resolution: {integrity: sha512-AOQff0zgR7cGsZL+4E7hVkmujoPUpm0J9xzWGWZj5wCjd3gmxESXAPfKyuzs93VdpQNFhHlBhfOjrcZ+XTERtQ==}
 
-  '@convex-dev/batch-worker@0.3.5':
-    resolution: {integrity: sha512-kTxLGy1TXRN6WLcENcoRWWnvPshv1sIZp2EpPqGqCB4FxDI7m8tEHUr+jCLdhGtSZT1UHkWtb1w8YYuEzTxHWQ==}
-    peerDependencies:
-      convex: ^1.43.0
-
   '@convex-dev/platform@0.1.11':
     resolution: {integrity: sha512-qdX+tYjNhNpEeLIiUhKDQQwdvUJDB529TrfJ9dAIclzLOW7DW1ozgIcyB2nl/MhlhBOUlHLY3wZ1xkjafrJO+Q==}
-
-  '@convex-dev/rate-limiter@0.4.2':
-    resolution: {integrity: sha512-njheoDd//MZgxtw+0PP3LL47PVMkvOKZmXDjYglDKSu5IdrfJtGmz/EHd6px9UcALuk/w7LTo83YwQ3bTGsMIg==}
-    peerDependencies:
-      convex: ^1.43.0
-      react: ^18.2.0 || ^19.0.0
-    peerDependenciesMeta:
-      react:
-        optional: true
 
   '@effect/platform-node-shared@4.1.4':
     resolution: {integrity: sha512-DWdfphHGOFJNj/mYadgpT3jIm8aRXDcPrQiGXFBH4p2H4XmA7iYMrPsI8NxVgZ7kNX0q1+FGJZJama0tINHRAg==}
@@ -907,12 +893,24 @@ packages:
       alchemy: 2.0.0-beta.87
       effect: ^4.1.4
 
-  '@samebase/identity-broker@0.34.0':
-    resolution: {integrity: sha512-jbg7KUZ9RA/4TcKaOSFZqAHW4xQkR9ArH30oomsk1UABw9kO2h/z+bZakmdXYZixrzeTYx/I8X8DOgSaTtaV8g==}
+  '@samebase/identity-broker@0.37.0':
+    resolution: {integrity: sha512-vL5z+nJcMOq2B4SuTBn70muOmoIZslXHCzeh6ndJk2xS/ItSSbS07Bi7hzs2ZrqmpQYsaCG445e1Vc3WDm8KxA==}
     engines: {node: '>=24.11.0'}
-    hasBin: true
     peerDependencies:
-      convex: ^1.47.0
+      '@alchemy.run/cloudflare': 2.0.0-beta.87
+      alchemy: 2.0.0-beta.87
+      convex: ^1.48.0
+      effect: ^4.1.4
+      fast-check: ^4.10.2
+    peerDependenciesMeta:
+      '@alchemy.run/cloudflare':
+        optional: true
+      alchemy:
+        optional: true
+      convex:
+        optional: true
+      fast-check:
+        optional: true
 
   '@testing-library/dom@10.4.2':
     resolution: {integrity: sha512-yzr2S9HyAIdhz2/6qHgbs665Q7PKVcDF05vsOlHPxG1mo36gKVesdYVeDLnXgfjJ03CrKRk08knc6+E/9m8v2Q==}
@@ -1341,28 +1339,6 @@ packages:
   convert-source-map@2.0.0:
     resolution: {integrity: sha512-Kvp459HrV2FEJ1CAsi1Ku+MY3kasH19TFykTz2xWmMeq6bk2NU3XXvfJ+Q61m0xktWwt+1HSYf3JZsTms3aRJg==}
 
-  convex-helpers@0.1.128:
-    resolution: {integrity: sha512-5n7uKsJrYnnybvuSAWgDQ9d5Avqk4CzFsJ22SXow4tHmVxSUH6qiJCeomWWxcLSfN9t9jpKIXNJiGJrjddS4ng==}
-    hasBin: true
-    peerDependencies:
-      '@standard-schema/spec': ^1.0.0
-      convex: ^1.46.0
-      hono: ^4.0.5
-      react: ^17.0.2 || ^18.0.0 || ^19.0.0
-      typescript: ^5.5 || ^6.0.0 || ^7.0.0
-      zod: ^3.25.0 || ^4.0.0
-    peerDependenciesMeta:
-      '@standard-schema/spec':
-        optional: true
-      hono:
-        optional: true
-      react:
-        optional: true
-      typescript:
-        optional: true
-      zod:
-        optional: true
-
   convex@1.48.0:
     resolution: {integrity: sha512-M9jEgTvCN8ziP/VgQQUH+j0ijM7g+NmQd8tFlvETK8/HMC/aaqHZwcu4hBO30X5DV2VIyYK4mOoLQGIb1766ew==}
     engines: {node: '>=20.0.0', npm: '>=7.0.0'}
@@ -1783,30 +1759,9 @@ snapshots:
 
   '@blazediff/core@1.10.0': {}
 
-  '@convex-dev/batch-worker@0.3.5(convex@1.48.0)(typescript@7.0.2)':
-    dependencies:
-      convex: 1.48.0
-      convex-helpers: 0.1.128(convex@1.48.0)(typescript@7.0.2)
-    transitivePeerDependencies:
-      - '@standard-schema/spec'
-      - hono
-      - react
-      - typescript
-      - zod
-
   '@convex-dev/platform@0.1.11':
     dependencies:
       openapi-fetch: 0.17.0
-
-  '@convex-dev/rate-limiter@0.4.2(convex@1.48.0)(typescript@7.0.2)':
-    dependencies:
-      '@convex-dev/batch-worker': 0.3.5(convex@1.48.0)(typescript@7.0.2)
-      convex: 1.48.0
-    transitivePeerDependencies:
-      - '@standard-schema/spec'
-      - hono
-      - typescript
-      - zod
 
   '@effect/platform-node-shared@4.1.4(effect@4.1.4)':
     dependencies:
@@ -2135,19 +2090,14 @@ snapshots:
       alchemy: 2.0.0-beta.87(@effect/platform-node@4.1.4(effect@4.1.4)(redis@6.3.1))(@voidzero-dev/vite-plus-core@1.4.0(@types/node@26.6.6)(esbuild@0.27.0)(typescript@7.0.2)(yaml@2.9.1))(effect@4.1.4)(ws@8.22.1)
       effect: 4.1.4
 
-  '@samebase/identity-broker@0.34.0(convex@1.48.0)(typescript@7.0.2)':
+  '@samebase/identity-broker@0.37.0(alchemy@2.0.0-beta.87(@effect/platform-node@4.1.4(effect@4.1.4)(redis@6.3.1))(@voidzero-dev/vite-plus-core@1.4.0(@types/node@26.6.6)(esbuild@0.27.0)(typescript@7.0.2)(yaml@2.9.1))(effect@4.1.4)(ws@8.22.1))(convex@1.48.0)(effect@4.1.4)':
     dependencies:
-      '@convex-dev/rate-limiter': 0.4.2(convex@1.48.0)(typescript@7.0.2)
-      convex: 1.48.0
-      convex-helpers: 0.1.128(convex@1.48.0)(typescript@7.0.2)
+      effect: 4.1.4
       jose: 6.2.13
       oauth4webapi: 3.8.8
-    transitivePeerDependencies:
-      - '@standard-schema/spec'
-      - hono
-      - react
-      - typescript
-      - zod
+    optionalDependencies:
+      alchemy: 2.0.0-beta.87(@effect/platform-node@4.1.4(effect@4.1.4)(redis@6.3.1))(@voidzero-dev/vite-plus-core@1.4.0(@types/node@26.6.6)(esbuild@0.27.0)(typescript@7.0.2)(yaml@2.9.1))(effect@4.1.4)(ws@8.22.1)
+      convex: 1.48.0
 
   '@testing-library/dom@10.4.2':
     dependencies:
@@ -2434,12 +2384,6 @@ snapshots:
       readdirp: 5.1.1
 
   convert-source-map@2.0.0: {}
-
-  convex-helpers@0.1.128(convex@1.48.0)(typescript@7.0.2):
-    dependencies:
-      convex: 1.48.0
-    optionalDependencies:
-      typescript: 7.0.2
 
   convex@1.48.0:
     dependencies:

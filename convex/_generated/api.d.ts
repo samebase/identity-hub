@@ -53,5 +53,5 @@ export declare const internal: FilterApi<
 >;
 
 export declare const components: {
-  identityBroker: import("@samebase/identity-broker/_generated/component.js").ComponentApi<"identityBroker">;
+  identityHub: import("@samebase/identity-broker/_generated/component.js").ComponentApi<"identityHub">;
 };
