@@ -13,13 +13,13 @@
     "test": "vp test"
   },
   "dependencies": {
-    "@samebase/identity-broker": "0.37.0",
+    "@samebase/identity-broker": "0.44.0",
     "convex": "1.48.0",
     "effect": "4.1.4"
   },
   "devDependencies": {
     "@effect/platform-node": "4.1.4",
-    "@samebase/alchemy-convex": "0.44.0",
+    "@samebase/alchemy-convex": "0.47.0",
     "@types/node": "26.6.6",
     "alchemy": "2.0.0-beta.87",
     "typescript": "7.0.2",

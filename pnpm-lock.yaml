@@ -202,8 +202,8 @@ importers:
   .:
     dependencies:
       '@samebase/identity-broker':
-        specifier: 0.37.0
-        version: 0.37.0(alchemy@2.0.0-beta.87(@effect/platform-node@4.1.4(effect@4.1.4)(redis@6.3.1))(@voidzero-dev/vite-plus-core@1.4.0(@types/node@26.6.6)(esbuild@0.27.0)(typescript@7.0.2)(yaml@2.9.1))(effect@4.1.4)(ws@8.22.1))(convex@1.48.0)(effect@4.1.4)
+        specifier: 0.44.0
+        version: 0.44.0(alchemy@2.0.0-beta.87(@effect/platform-node@4.1.4(effect@4.1.4)(redis@6.3.1))(@voidzero-dev/vite-plus-core@1.4.0(@types/node@26.6.6)(esbuild@0.27.0)(typescript@7.0.2)(yaml@2.9.1))(effect@4.1.4)(ws@8.22.1))(convex@1.48.0)(effect@4.1.4)
       convex:
         specifier: 1.48.0
         version: 1.48.0
@@ -215,8 +215,8 @@ importers:
         specifier: 4.1.4
         version: 4.1.4(effect@4.1.4)(redis@6.3.1)
       '@samebase/alchemy-convex':
-        specifier: 0.44.0
-        version: 0.44.0(@effect/platform-node@4.1.4(effect@4.1.4)(redis@6.3.1))(alchemy@2.0.0-beta.87(@effect/platform-node@4.1.4(effect@4.1.4)(redis@6.3.1))(@voidzero-dev/vite-plus-core@1.4.0(@types/node@26.6.6)(esbuild@0.27.0)(typescript@7.0.2)(yaml@2.9.1))(effect@4.1.4)(ws@8.22.1))(convex@1.48.0)(effect@4.1.4)
+        specifier: 0.47.0
+        version: 0.47.0(@effect/platform-node@4.1.4(effect@4.1.4)(redis@6.3.1))(alchemy@2.0.0-beta.87(@effect/platform-node@4.1.4(effect@4.1.4)(redis@6.3.1))(@voidzero-dev/vite-plus-core@1.4.0(@types/node@26.6.6)(esbuild@0.27.0)(typescript@7.0.2)(yaml@2.9.1))(effect@4.1.4)(ws@8.22.1))(convex@1.48.0)(effect@4.1.4)
       '@types/node':
         specifier: 26.6.6
         version: 26.6.6
@@ -876,8 +876,8 @@ packages:
   '@rolldown/pluginutils@1.0.1':
     resolution: {integrity: sha512-2j9bGt5Jh8hj+vPtgzPtl72j0yRxHAyumoo6TNfAjsLB04UtpSvPbPcDcBMxz7n+9CYB0c1GxQFxYRg2jimqGw==}
 
-  '@samebase/alchemy-convex@0.44.0':
-    resolution: {integrity: sha512-jXcStGYGEhf0WTb5ZRjiWAIPT4mdEhTPuXsEAk9LJhYfae7bkncivt119/DTWLKJrHOxlOYKMCak0kUqqcRjhg==}
+  '@samebase/alchemy-convex@0.47.0':
+    resolution: {integrity: sha512-pEoA3mlqYatMgjPrnT3OFTr9WUP7vN6tTCfB068s4s4gih3qmGCTBs1Ycs2c/zC/dxj0/Tpij9lcn7ucKW3+3Q==}
     engines: {node: '>=22'}
     hasBin: true
     peerDependencies:
@@ -886,15 +886,15 @@ packages:
       convex: ^1.48.0
       effect: ^4.1.4
 
-  '@samebase/alchemy-kit@0.6.0':
-    resolution: {integrity: sha512-gwuUxqUEo4l7/wdNxw3yifG/JUVxe0Aev9qg2ZQIbR7lQ5KZsgBiAwq1gbUg5EWNKa5/SakbZb3r4AZ0hbmefA==}
+  '@samebase/alchemy-kit@0.7.0':
+    resolution: {integrity: sha512-8PIU7GUDlfvdgeSs0gVd0043qzLDrt/4HAE6hODlNZGDB5kznMYem8mG5O3l+o042D2pGOARr5GHklzsj5W8yA==}
     engines: {node: '>=22'}
     peerDependencies:
       alchemy: 2.0.0-beta.87
       effect: ^4.1.4
 
-  '@samebase/identity-broker@0.37.0':
-    resolution: {integrity: sha512-vL5z+nJcMOq2B4SuTBn70muOmoIZslXHCzeh6ndJk2xS/ItSSbS07Bi7hzs2ZrqmpQYsaCG445e1Vc3WDm8KxA==}
+  '@samebase/identity-broker@0.44.0':
+    resolution: {integrity: sha512-RRyTsC4WTtKlownborx6GowIpNPNpWF4QRsTZz2Fy2R5FnJpR4eBMXIAAkLhYDijwYhG8hU+9jXbVPsHSmQg7Q==}
     engines: {node: '>=24.11.0'}
     peerDependencies:
       '@alchemy.run/cloudflare': 2.0.0-beta.87
@@ -1737,6 +1737,7 @@ packages:
   yuku-parser@0.19.0:
     resolution: {integrity: sha512-XrBh9ZiQK5mJVRxZBAvD6LwRyAYrK3MFtH3+onyuxFL5hFD44EC3QOmIC1FjTj6H2MMwq46/NAI+NZxLZPZgxg==}
     engines: {node: '>=14.18.0'}
+    deprecated: 'Yuku is now one package with one core. Use "yuku" instead: https://yuku.fyi/javascript/. Existing installs keep working but get no more fixes.'
 
 snapshots:
 
@@ -2076,21 +2077,21 @@ snapshots:
 
   '@rolldown/pluginutils@1.0.1': {}
 
-  '@samebase/alchemy-convex@0.44.0(@effect/platform-node@4.1.4(effect@4.1.4)(redis@6.3.1))(alchemy@2.0.0-beta.87(@effect/platform-node@4.1.4(effect@4.1.4)(redis@6.3.1))(@voidzero-dev/vite-plus-core@1.4.0(@types/node@26.6.6)(esbuild@0.27.0)(typescript@7.0.2)(yaml@2.9.1))(effect@4.1.4)(ws@8.22.1))(convex@1.48.0)(effect@4.1.4)':
+  '@samebase/alchemy-convex@0.47.0(@effect/platform-node@4.1.4(effect@4.1.4)(redis@6.3.1))(alchemy@2.0.0-beta.87(@effect/platform-node@4.1.4(effect@4.1.4)(redis@6.3.1))(@voidzero-dev/vite-plus-core@1.4.0(@types/node@26.6.6)(esbuild@0.27.0)(typescript@7.0.2)(yaml@2.9.1))(effect@4.1.4)(ws@8.22.1))(convex@1.48.0)(effect@4.1.4)':
     dependencies:
       '@convex-dev/platform': 0.1.11
       '@effect/platform-node': 4.1.4(effect@4.1.4)(redis@6.3.1)
-      '@samebase/alchemy-kit': 0.6.0(alchemy@2.0.0-beta.87(@effect/platform-node@4.1.4(effect@4.1.4)(redis@6.3.1))(@voidzero-dev/vite-plus-core@1.4.0(@types/node@26.6.6)(esbuild@0.27.0)(typescript@7.0.2)(yaml@2.9.1))(effect@4.1.4)(ws@8.22.1))(effect@4.1.4)
+      '@samebase/alchemy-kit': 0.7.0(alchemy@2.0.0-beta.87(@effect/platform-node@4.1.4(effect@4.1.4)(redis@6.3.1))(@voidzero-dev/vite-plus-core@1.4.0(@types/node@26.6.6)(esbuild@0.27.0)(typescript@7.0.2)(yaml@2.9.1))(effect@4.1.4)(ws@8.22.1))(effect@4.1.4)
       alchemy: 2.0.0-beta.87(@effect/platform-node@4.1.4(effect@4.1.4)(redis@6.3.1))(@voidzero-dev/vite-plus-core@1.4.0(@types/node@26.6.6)(esbuild@0.27.0)(typescript@7.0.2)(yaml@2.9.1))(effect@4.1.4)(ws@8.22.1)
       convex: 1.48.0
       effect: 4.1.4
 
-  '@samebase/alchemy-kit@0.6.0(alchemy@2.0.0-beta.87(@effect/platform-node@4.1.4(effect@4.1.4)(redis@6.3.1))(@voidzero-dev/vite-plus-core@1.4.0(@types/node@26.6.6)(esbuild@0.27.0)(typescript@7.0.2)(yaml@2.9.1))(effect@4.1.4)(ws@8.22.1))(effect@4.1.4)':
+  '@samebase/alchemy-kit@0.7.0(alchemy@2.0.0-beta.87(@effect/platform-node@4.1.4(effect@4.1.4)(redis@6.3.1))(@voidzero-dev/vite-plus-core@1.4.0(@types/node@26.6.6)(esbuild@0.27.0)(typescript@7.0.2)(yaml@2.9.1))(effect@4.1.4)(ws@8.22.1))(effect@4.1.4)':
     dependencies:
       alchemy: 2.0.0-beta.87(@effect/platform-node@4.1.4(effect@4.1.4)(redis@6.3.1))(@voidzero-dev/vite-plus-core@1.4.0(@types/node@26.6.6)(esbuild@0.27.0)(typescript@7.0.2)(yaml@2.9.1))(effect@4.1.4)(ws@8.22.1)
       effect: 4.1.4
 
-  '@samebase/identity-broker@0.37.0(alchemy@2.0.0-beta.87(@effect/platform-node@4.1.4(effect@4.1.4)(redis@6.3.1))(@voidzero-dev/vite-plus-core@1.4.0(@types/node@26.6.6)(esbuild@0.27.0)(typescript@7.0.2)(yaml@2.9.1))(effect@4.1.4)(ws@8.22.1))(convex@1.48.0)(effect@4.1.4)':
+  '@samebase/identity-broker@0.44.0(alchemy@2.0.0-beta.87(@effect/platform-node@4.1.4(effect@4.1.4)(redis@6.3.1))(@voidzero-dev/vite-plus-core@1.4.0(@types/node@26.6.6)(esbuild@0.27.0)(typescript@7.0.2)(yaml@2.9.1))(effect@4.1.4)(ws@8.22.1))(convex@1.48.0)(effect@4.1.4)':
     dependencies:
       effect: 4.1.4
       jose: 6.2.13
