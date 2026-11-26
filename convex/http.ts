@@ -1,7 +1,7 @@
 import { httpRouter } from "convex/server";
-import { hub } from "./broker";
+import { broker } from "./broker";
 
 const http = httpRouter();
-hub.addHttpRoutes(http);
+broker.addHttpRoutes(http);
 
 export default http;

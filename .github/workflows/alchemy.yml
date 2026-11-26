@@ -1,4 +1,4 @@
-# Deploys the hub with Alchemy (alchemy.run.ts): a push to main, or Run workflow on main after a
+# Deploys the broker with Alchemy (alchemy.run.ts): a push to main, or Run workflow on main after a
 # secret or variable changed, deploys the stage `prod`, the production deployment, and nothing
 # else. The state is in the `alchemy-state-store` project of the Convex team, under the stack name
 # GITHUB_REPOSITORY. The run needs the team token CONVEX_ACCESS_TOKEN, with which it mints the

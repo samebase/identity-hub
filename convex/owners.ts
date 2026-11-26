@@ -1,7 +1,7 @@
 /**
- * Who may register at this hub, from HUB_OWNERS: `any`, or the numeric ids of the GitHub accounts
+ * Who may register at this broker, from HUB_OWNERS: `any`, or the numeric ids of the GitHub accounts
  * (users or organizations) whose repositories may register, separated by commas. Anything else
- * throws, so a typo stops the deploy instead of opening or closing the hub. The owner is the one
+ * throws, so a typo stops the deploy instead of opening or closing the broker. The owner is the one
  * GitHub's token of the registering run proves: the account that owns the repository, never the
  * person or bot that ran the workflow.
  */

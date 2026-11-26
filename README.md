@@ -1,25 +1,25 @@
 # identity-hub
 
 Google and GitHub sign-in for every deployment of your app: production, each pull request preview,
-each dev checkout. One Google client serves them all. The hub keeps no user accounts: each app gets
-a standard OpenID Connect `id_token` and owns its users.
+each dev checkout. One Google client serves them all. The identity broker keeps no user accounts:
+each app gets a standard OpenID Connect `id_token` and owns its users.
 
 [![Convex Component](https://www.convex.dev/components/badge/samebase/identity-broker)](https://www.convex.dev/components/samebase/identity-broker)
 [![npm](https://img.shields.io/npm/v/@samebase/identity-broker?label=%40samebase%2Fidentity-broker)](https://www.npmjs.com/package/@samebase/identity-broker)
 [![License](https://img.shields.io/badge/license-MIT-blue)](./LICENSE)
 
-![Google and GitHub refuse preview deployments because each has a new URL. The hub sits in front of them, so each provider sees one client and one URL, and every app and preview registers its exact URL at deploy.](https://raw.githubusercontent.com/samebase/samebase/main/packages/identity-broker/docs/how-it-works.gif)
+![Google and GitHub refuse preview deployments because each has a new URL. The identity broker sits in front of them, so each provider sees one client and one URL, and every app and preview registers its exact URL at deploy.](https://raw.githubusercontent.com/samebase/samebase/main/packages/identity-broker/docs/how-it-works.gif)
 
 ## Which one are you?
 
-**You want sign-in in your app.** You do not need to run a hub. Samebase runs this repository,
-unchanged, as a public hub at `id.samebase.com`, and an app registers there from its own GitHub
-Actions run, with no account. Start from [samebase/base](https://github.com/samebase/base), where it
-works on the first deploy. In its Alchemy stack it is one resource:
+**You want sign-in in your app.** You do not need to run a broker. Samebase runs this repository,
+unchanged, as a public identity broker at `id.samebase.com`, and an app registers there from its own
+GitHub Actions run, with no account. Start from [samebase/base](https://github.com/samebase/base),
+where it works on the first deploy. In its Alchemy stack it is one resource:
 
 ```ts
-IdentityHub.Client("IdentityHubClient", {
-  hub: { issuer: "https://id.samebase.com" },
+IdentityBroker.Client("IdentityHubClient", {
+  broker: { issuer: "https://id.samebase.com" },
   connectors: ["google", "github"],
   redirectUris: [Output.interpolate`${deployment.siteUrl}/auth/hub/callback`],
   deploymentType: stage === "prod" ? "production" : "preview",
@@ -28,26 +28,27 @@ IdentityHub.Client("IdentityHubClient", {
 
 For an app that does not come from the starter, the broker's
 [consumer guide](https://github.com/samebase/samebase/blob/main/packages/identity-broker/docs/consumers.md)
-has the steps. The public hub is a shared service under
+has the steps. The public broker is a shared service under
 [Samebase's terms](https://samebase.com/terms).
 
-**You want your own hub.** Your name on the sign-in page, your Google project, and your rules about
-who may register. This repository is the template: [run your own hub](#run-your-own-hub).
+**You want your own broker.** Your name on the sign-in page, your Google project, and your rules
+about who may register. This repository is the template:
+[run your own broker](#run-your-own-broker).
 
-## Why a hub
+## Why a broker
 
 - **Providers want one callback URL.** Google and GitHub need each redirect URI registered by hand,
-  so a preview deployment with a fresh URL cannot have Google sign-in. The hub registers that URL
+  so a preview deployment with a fresh URL cannot have Google sign-in. The broker registers that URL
   itself, at deploy time.
 - **No account, no token.** An app registers in its own GitHub Actions run, with GitHub's OIDC token
   as proof of its repository. `HUB_OWNERS` decides which GitHub accounts may register.
 - **Users are portable.** A user's `sub` is the provider's own id, `google:<id>` or `github:<id>`,
-  the same at every hub. An app can move to another hub and keep its users.
+  the same at every broker. An app can move to another broker and keep its users.
 
-The hub is [`@samebase/identity-broker`](https://www.npmjs.com/package/@samebase/identity-broker)
+The broker is [`@samebase/identity-broker`](https://www.npmjs.com/package/@samebase/identity-broker)
 plus the settings of this repository.
 
-## Run your own hub
+## Run your own broker
 
 You need a Convex team, a Google Cloud project, and a GitHub account.
 
@@ -86,7 +87,7 @@ providers use it, so decide now.
 
 - **Google Cloud console**, Google Auth Platform, Clients: a Web application client with the
   redirect URI `<issuer>/connectors/google/callback`. Publish the app and add your domain to the
-  branding when you open the hub to other people.
+  branding when you open the broker to other people.
 - **GitHub**, Settings, Developer settings, OAuth Apps: a new OAuth App with the callback URL
   `<issuer>/connectors/github/callback`.
 
@@ -108,22 +109,22 @@ The script refuses a deployment that already has keys. Back up the value it writ
 
 ### 7. Run the workflow again
 
-This run pushes the hub. `<issuer>/.well-known/openid-configuration` now answers with your issuer.
+This run pushes the broker. `<issuer>/.well-known/openid-configuration` now answers with your
+issuer.
 
 Every push to `main` deploys again. After you change a secret or a variable, run the workflow by
 hand: saving a secret does not start a run.
 
-## Connect an app to your hub
+## Connect an app to your broker
 
-An app from [samebase/base](https://github.com/samebase/base) names its hub in `alchemy.run.ts`:
+An app from [samebase/base](https://github.com/samebase/base) names its broker in `alchemy.run.ts`:
 
 ```ts
 const HUB = { issuer: "https://<your issuer>", terms: "<your HUB_TERMS_URL>" };
 ```
 
-Its next deploy registers its clients here. Any other app uses the `IdentityHub.Client` resource of
-[`@samebase/alchemy-convex`](https://www.npmjs.com/package/@samebase/alchemy-convex), with
-`connectors: ["google", "github"]`. The broker's
+Its next deploy registers its clients here. Any other app uses the `IdentityBroker.Client` resource
+of `@samebase/identity-broker/alchemy`, with `connectors: ["google", "github"]`. The broker's
 [consumer guide](https://github.com/samebase/samebase/blob/main/packages/identity-broker/docs/consumers.md)
 has the details.
 
@@ -170,7 +171,7 @@ and needs the new callbacks.
   you block it.
 - The deploy key and `CONVEX_ACCESS_TOKEN` can read the signing keys. Treat both as administrator
   credentials.
-- Never run `npx convex import --replace-all` on the hub: it also deletes the components' rows.
+- Never run `npx convex import --replace-all` on the broker: it also deletes the components' rows.
 
 ## Upgrade
 
@@ -178,9 +179,10 @@ Renovate opens a pull request when a new broker or alchemy-convex version is out
 [broker's changelog](https://github.com/samebase/samebase/blob/main/packages/identity-broker/CHANGELOG.md)
 before you merge: a release that changes stored data says what to do. After the first push of
 0.37.0, the old component `identityBroker` is unmounted; its rows stay in the deployment, and the
-Convex dashboard can delete them.
+Convex dashboard can delete them. The component stays mounted as `identityHub`, the name its rows
+are stored under.
 
-## What the hub holds
+## What the broker holds
 
 - **No user accounts, no sessions, no passwords.** Every sign-in goes to Google or GitHub again, and
   the app makes its own user from the `id_token`.

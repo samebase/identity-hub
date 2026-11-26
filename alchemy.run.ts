@@ -1,12 +1,12 @@
-// The stack of this identity hub, with one stage: `prod` is the production deployment of a Convex
-// project that this stack creates, and nothing else is deployed. The stack never adopts: a project
-// or deployment that exists without this stack's state belongs to something else, such as another
-// hub in the same Convex team, and the run stops instead of pushing over it. The stack is named
-// after the repository; its state is in the team's `alchemy-state-store` project.
+// The stack of this identity broker, with one stage: `prod` is the production deployment of a
+// Convex project that this stack creates, and nothing else is deployed. The stack never adopts: a
+// project or deployment that exists without this stack's state belongs to something else, such as
+// another broker in the same Convex team, and the run stops instead of pushing over it. The stack
+// is named after the repository; its state is in the team's `alchemy-state-store` project.
 //
 // The first run, before the Google and GitHub clients exist, creates the project and an empty
 // production deployment and pushes nothing: the clients' callbacks need its URL. Once the four
-// client values are set, every run pushes the hub (README, Start).
+// client values are set, every run pushes the broker (README, Start).
 import { execFileSync } from "node:child_process";
 import process from "node:process";
 import * as Convex from "@samebase/alchemy-convex";
@@ -39,7 +39,7 @@ const required = (name: string) => {
   return value;
 };
 
-/** The values of the two connectors. The hub is pushed once all four are set. */
+/** The values of the two connectors. The broker is pushed once all four are set. */
 const CLIENT_SETTINGS = [
   "GOOGLE_CLIENT_ID",
   "GOOGLE_CLIENT_SECRET",
@@ -52,11 +52,11 @@ export default Alchemy.Stack(
   { providers: Convex.providers(), state: Convex.withRunRecord(Convex.state()) },
   Effect.gen(function* () {
     const { stage } = yield* Alchemy.Stack;
-    // One stage: any other name would be a second hub with its own project.
+    // One stage: any other name would be a second broker with its own project.
     if (stage !== "prod") {
       throw new Error(`This stack has one stage, prod. The stage ${stage} is not deployed.`);
     }
-    // Checked before anything is created: a typo never opens or closes the hub.
+    // Checked before anything is created: a typo never opens or closes the broker.
     const owners = required("HUB_OWNERS");
     parseOwners(owners);
     const project = yield* Convex.Project("Project", {
