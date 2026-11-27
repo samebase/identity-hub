@@ -14,8 +14,7 @@ each app gets a standard OpenID Connect `id_token` and owns its users.
 
 **You want sign-in in your app.** You do not need to run a broker. Samebase runs this repository,
 unchanged, as a public identity broker at `id.samebase.com`, and an app registers there from its own
-GitHub Actions run, with no account. Start from [samebase/base](https://github.com/samebase/base),
-where it works on the first deploy. In its Alchemy stack it is one resource:
+GitHub Actions run, with no account. In the app's Alchemy stack it is one resource:
 
 ```ts
 IdentityBroker.Client("IdentityHubClient", {
@@ -26,10 +25,12 @@ IdentityBroker.Client("IdentityHubClient", {
 });
 ```
 
-For an app that does not come from the starter, the broker's
+The broker's
 [consumer guide](https://github.com/samebase/samebase/blob/main/packages/identity-broker/docs/consumers.md)
 has the steps. The public broker is a shared service under
-[Samebase's terms](https://samebase.com/terms).
+[Samebase's terms](https://samebase.com/terms). The starter
+[samebase/base](https://github.com/samebase/base) uses Samebase's other public broker,
+[login.samebase.com](https://login.samebase.com), which needs no registration.
 
 **You want your own broker.** Your name on the sign-in page, your Google project, and your rules
 about who may register. This repository is the template:
@@ -117,14 +118,9 @@ hand: saving a secret does not start a run.
 
 ## Connect an app to your broker
 
-An app from [samebase/base](https://github.com/samebase/base) names its broker in `alchemy.run.ts`:
-
-```ts
-const HUB = { issuer: "https://<your issuer>", terms: "<your HUB_TERMS_URL>" };
-```
-
-Its next deploy registers its clients here. Any other app uses the `IdentityBroker.Client` resource
-of `@samebase/identity-broker/alchemy`, with `connectors: ["google", "github"]`. The broker's
+An app uses the `IdentityBroker.Client` resource of `@samebase/identity-broker/alchemy`, with your
+issuer and `connectors: ["google", "github"]`. Its next deploy registers its clients here. The
+broker's
 [consumer guide](https://github.com/samebase/samebase/blob/main/packages/identity-broker/docs/consumers.md)
 has the details.
 
