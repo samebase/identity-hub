@@ -10,6 +10,7 @@
 
 import type * as broker from "../broker.js";
 import type * as crons from "../crons.js";
+import type * as home from "../home.js";
 import type * as http from "../http.js";
 import type * as owners from "../owners.js";
 
@@ -22,6 +23,7 @@ import type {
 declare const fullApi: ApiFromModules<{
   broker: typeof broker;
   crons: typeof crons;
+  home: typeof home;
   http: typeof http;
   owners: typeof owners;
 }>;
