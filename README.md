@@ -1,3 +1,18 @@
+# Moved to [samebase/public-identity-broker](https://github.com/samebase/public-identity-broker)
+
+**This repository is archived, and the broker at `id.samebase.com` is shut down.**
+
+Sign-in for any site is now at `https://login.samebase.com`. A site serves one JSON file and needs
+no registration, no client secret and no GitHub Actions step. Start at
+[samebase/public-identity-broker](https://github.com/samebase/public-identity-broker).
+
+The package
+[`@samebase/identity-broker`](https://www.npmjs.com/package/@samebase/identity-broker) is still
+maintained in [samebase/samebase](https://github.com/samebase/samebase/tree/main/packages/identity-broker).
+The text below shows this repository as it was.
+
+---
+
 # identity-hub
 
 Google and GitHub sign-in for every deployment of your app: production, each pull request preview,
